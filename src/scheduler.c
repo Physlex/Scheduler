@@ -6,6 +6,9 @@
 #include "tasks.h"
 #include "app/defs.h"
 
+#include <string.h>
+#include <assert.h>
+
 
 typedef struct sched_ctx {
     uint8_t *mem;
@@ -37,7 +40,7 @@ static task_t *sched_ctx_cache_task(task_t *task) {
 
     uint8_t *task_bytes = (uint8_t *)task;
     memcpy(static_ctx.mem, task_bytes, sizeof(task_t));
-    task_t *cached_task = (task_t *)static_ctx.mem[static_ctx.addr];
+    task_t *cached_task = (task_t *)(&static_ctx.mem[static_ctx.addr]);
 
     uint32_t next_addr = (static_ctx.addr + sizeof(task_t)) % static_ctx.size;
     if (next_addr < static_ctx.addr) {
@@ -50,18 +53,19 @@ static task_t *sched_ctx_cache_task(task_t *task) {
 }
 
 
-sched_error_kind sched_create(scheduler_t *self) {
+sched_error_kind sched_create(scheduler_t *ctx) {
+    ring_create(&ctx->task_ring, KB2, sizeof(task_t));
     return SEK_SUCCESS;
 }
 
 
-sched_error_kind sched_enqueue(scheduler_t *self, task_t *task) {
-    if (!self || !task) {
+sched_error_kind sched_enqueue(scheduler_t *ctx, task_t *task) {
+    if (!ctx || !task) {
         return -SEK_REQS;
     }
 
     task_t *cached_task = sched_ctx_cache_task(task);
-    if ( ring_enqueue(self->task_ring, (void*)cached_task) < 0 ) {
+    if ( ring_enqueue(&ctx->task_ring, (uint8_t*)cached_task) < 0 ) {
         return -SEK_OTHER;
     }
 
@@ -69,9 +73,9 @@ sched_error_kind sched_enqueue(scheduler_t *self, task_t *task) {
 }
 
 
-void sched_run(scheduler_t *self) {
+void sched_run(scheduler_t *ctx) {
     while (1) {
-        task_t *task = (task_t *)ring_dequeue(self->task_ring);
+        task_t *task = (task_t *)ring_dequeue(&ctx->task_ring);
 
         int8_t ts = task->stat.poll();
         switch (ts) {
@@ -94,7 +98,7 @@ void sched_run(scheduler_t *self) {
         }
 
         if (task->stat.poll() != TS_DONE) {
-            assert(ring_enqueue(self->task_ring, task) > 0);
+            assert(ring_enqueue(&ctx->task_ring, (uint8_t*)task) >= 0);
         }
     }
 }

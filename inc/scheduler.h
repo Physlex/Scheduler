@@ -41,7 +41,7 @@ typedef enum sched_error {
  *  @brief TODO: DOCS
  */
 typedef struct scheduler {
-    ring_t *task_ring;
+    ring_t task_ring;
 } scheduler_t;
 
 

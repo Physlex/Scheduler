@@ -18,37 +18,43 @@ extern "C" {
  */
 typedef enum ring_error {
     REK_SUCCESS=0x00U,
-    REK_REQS
+    REK_REQS,
+    REK_MEMORY
 } ring_error_kind;
-
 
 /** @struct ring
  *  @typedef ring_t
  *  @brief TODO: DOCS
  */
 typedef struct ring {
-    void *data;
-    uint32_t type_size;
+    uint8_t *data;
+    uint32_t size;
     uint32_t length;
+    uint32_t write_ptr;
+    uint32_t read_ptr;
 } ring_t;
 
-
 /** @fn int8_t ring_create(ring_t *, uint32_t, uint32_t)
- *  @brief TODO: DOCS
+ *  @brief This function allocates resources for the ring buffer.
+ * 
+ *  TODO: DOCS
  */
-extern int8_t ring_create(ring_t *ctx, uint32_t size);
+extern int8_t ring_create(ring_t *ctx, uint32_t length, uint32_t size);
 
+/** @fn void ring_destroy(ring_t *)
+ *  @brief This function releases the ring buffer resources.
+ */
+extern int8_t ring_destroy(ring_t *ctx);
 
 /** @fn int8_t ring_enqueue(ring_t *, void *)
  *  @brief TODO: DOCS
  */
-extern int8_t ring_enqueue(ring_t *ctx, void *datum);
-
+extern int8_t ring_enqueue(ring_t *ctx, uint8_t *datum);
 
 /** @fn void *ring_dequeue(ring_t *)
  *  @brief TODO: DOCS
  */
-extern void *ring_dequeue(ring_t *ctx);
+extern int8_t *ring_dequeue(ring_t *ctx);
 
 
 #ifdef __cplusplus
