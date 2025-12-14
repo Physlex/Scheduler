@@ -26,7 +26,7 @@ function(add_tests)
         )
 
         target_link_libraries(
-            ${RUNTIME_NAME} PRIVATE ${LIBRARIES} GTest::gtest GTest::gtest_main
+            ${RUNTIME_NAME} PRIVATE ${ADDTEST_LIBRARIES} GTest::gtest GTest::gtest_main
         )
 
         add_test(NAME ${RUNTIME_NAME} COMMAND ${RUNTIME_NAME})
