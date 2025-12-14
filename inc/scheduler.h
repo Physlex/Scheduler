@@ -5,14 +5,13 @@
  *  @brief TODO: DOCS
  */
 
-#include "tasks.h"
-#include "app/types.h"
-#include "utility/ring.h"
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include "tasks.h"
+#include "conf/types.h"
+#include "utility/ring.h"
 
 /** @enum sched_error
  *  @typedef sched_error_kind

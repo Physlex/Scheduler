@@ -5,6 +5,9 @@
  *  @brief TODO: DOCS
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @def KB2
  *  @brief Two kibibyte as number.
@@ -15,5 +18,9 @@
 #define nullptr 0
 #endif
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // SCHEDULER_CORE_APP_DEFS_H_

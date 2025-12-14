@@ -4,7 +4,7 @@
 
 #include "scheduler.h"
 #include "tasks.h"
-#include "app/defs.h"
+#include "conf/defs.h"
 
 #include <string.h>
 #include <assert.h>

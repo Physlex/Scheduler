@@ -3,30 +3,40 @@
  */
 
 #include "utility/ring.h"
+#include "utility/errors.h"
 
 #include <stdlib.h>
 
 
 int8_t ring_create(ring_t *ctx, uint32_t length, uint32_t size) {
     if (!ctx) {
-        return -REK_REQS;
+        return -EC_REQUIRES;
     }
 
     ctx->data = (uint8_t*)malloc(size * length);
     if (!ctx->data) {
-        return -REK_MEMORY;
+        return -EC_MEMFULL;
     }
 
     ctx->size = size;
     ctx->length = length * size;
 
-    return REK_SUCCESS;
+    return EC_SUCCESS;
+}
+
+
+int8_t ring_destroy(ring_t *ctx) {
+    if (!ctx) {
+        return -EC_REQUIRES;
+    }
+
+    free(ctx->data);
 }
 
 
 int8_t ring_enqueue(ring_t *ctx, uint8_t *datum) {
     if (!ctx || !datum) {
-        return -REK_REQS;
+        return -EC_REQUIRES;
     }
 
     for (uint32_t bytes_written; bytes_written < ctx->size; ++bytes_written) {
@@ -35,18 +45,9 @@ int8_t ring_enqueue(ring_t *ctx, uint8_t *datum) {
 
     (ctx->write_ptr += ctx->size) % ctx->length;
 
-    return REK_SUCCESS;
+    return EC_SUCCESS;
 }
 
 
 int8_t *ring_dequeue(ring_t *ctx) {
-}
-
-
-int8_t ring_destroy(ring_t *ctx) {
-    if (!ctx) {
-        return -REK_REQS;
-    }
-
-    free(ctx->data);
 }

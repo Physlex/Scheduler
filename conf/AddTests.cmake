@@ -21,18 +21,14 @@ function(add_tests)
 
         add_executable(${RUNTIME_NAME} ${TEST})
 
-        set_target_properties(${RUNTIME_NAME} PROPERTIES
-            RUNTIME_OUTPUT_NAME "${RUNTIME_NAME}.out"
-        )
-
         target_include_directories(
             ${RUNTIME_NAME} PRIVATE ${ADDTEST_INCLUDES}
         )
 
         target_link_libraries(
-            ${RUNTIME_NAME} PRIVATE ${LIBRARIES} GTest::gtest_main
+            ${RUNTIME_NAME} PRIVATE ${LIBRARIES} GTest::gtest GTest::gtest_main
         )
 
-        gtest_discover_tests(${RUNTIME_NAME})
+        add_test(NAME ${RUNTIME_NAME} COMMAND ${RUNTIME_NAME})
     endforeach()
 endfunction()

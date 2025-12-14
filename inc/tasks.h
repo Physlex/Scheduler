@@ -1,12 +1,12 @@
 #ifndef SCHEDULER_CORE_TASKS_H_
 #define SCHEDULER_CORE_TASKS_H_
 
-#include <stddef.h>
-#include <stdint.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <stddef.h>
+#include <stdint.h>
 
 typedef enum task_state {
     TS_READY,

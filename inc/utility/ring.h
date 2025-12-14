@@ -5,22 +5,12 @@
  *  @brief TODO: DOCS
  */
 
-#include "app/types.h"
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/** @enum ring_error
- *  @typedef ring_error_kind
- *  @brief TODO: DOCS
- */
-typedef enum ring_error {
-    REK_SUCCESS=0x00U,
-    REK_REQS,
-    REK_MEMORY
-} ring_error_kind;
+
+#include "conf/types.h"
 
 /** @struct ring
  *  @typedef ring_t
