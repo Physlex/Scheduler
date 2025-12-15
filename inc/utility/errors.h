@@ -42,14 +42,24 @@ typedef enum error_code {
     EC_REQUIRES,
 
     /** @memberof enum error_code
-     *  @brief No error was detected.
+     *  @brief TODO: DOCS
      */
     EC_MEMFULL,
 
     /** @memberof enum error_code
-     *  @brief No error was detected.
+     *  @brief TODO: DOCS
      */
-    EC_MISUSE
+    EC_MISUSE,
+
+    /** @memberof enum error_code
+     *  @brief TODO: DOCS
+     */
+    EC_UNDERRUN,
+
+    /** @memberof enum error_code
+     *  @brief TODO: DOCS
+     */
+    EC_OVERRUN
 } error_code_k;
 
 

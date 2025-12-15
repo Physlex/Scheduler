@@ -4,6 +4,7 @@
 
 #include "utility/ring.h"
 #include "utility/errors.h"
+#include "conf/defs.h"
 
 #include <stdlib.h>
 
@@ -50,4 +51,5 @@ int8_t ring_enqueue(ring_t *ctx, uint8_t *datum) {
 
 
 int8_t *ring_dequeue(ring_t *ctx) {
+    return nullptr;
 }
