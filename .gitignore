@@ -9,6 +9,8 @@ build/
 .python-version
 .*
 uv.lock
+__pycache__
+*.egg-info
 
 # Generics
 *.a

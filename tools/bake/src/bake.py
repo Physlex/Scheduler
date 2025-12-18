@@ -34,13 +34,13 @@ def main():
 
     parser = argparse.ArgumentParser(prog=Path(__file__).stem, description=__doc__)
     group = parser.add_argument_group("run options", "Possible ways to run the script")
-    group.add_mutually_exclusive_group(required=True)
+    mutual = group.add_mutually_exclusive_group(required=True)
 
-    group.add_argument(
+    mutual.add_argument(
         "-b", "--build", help="Wrapper for the equivalent cmake function"
     )
 
-    group.add_argument(
+    mutual.add_argument(
         "-t", "--test", help="Builds the test suite, and runs all tests in a series"
     )
 
