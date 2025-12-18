@@ -1,4 +1,17 @@
 # file: `.gitignore`
 
+# C/C++ build system
 build/
 .vscode/
+
+# Python build system
+.venv
+.python-version
+.*
+uv.lock
+
+# Generics
+*.a
+*.o
+*.out
+*.exe
