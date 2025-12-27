@@ -3,7 +3,7 @@
  */
 
 #include "utility/logger.h"
-#include "utility/ring.h"
+#include "container/ring.h"
 #include "utility/errors.h"
 
 

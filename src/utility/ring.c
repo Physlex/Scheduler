@@ -2,25 +2,30 @@
  *  @brief This file implements the ring module.
  */
 
-#include "utility/ring.h"
+#include <stdlib.h>
+#include <string.h>
+
+#include "container/ring.h"
 #include "utility/errors.h"
 #include "conf/defs.h"
 
-#include <stdlib.h>
 
-
-int8_t ring_create(ring_t *ctx, uint32_t length, uint32_t size) {
+int8_t ring_create(ring_t *ctx, uint32_t size, uint32_t length) {
     if (!ctx) {
         return -EC_REQUIRES;
     }
 
-    ctx->data = (uint8_t*)malloc(size * length);
+    ctx->size = size;
+    ctx->length = length * size;
+    ctx->read_ptr = 0;
+    ctx->write_ptr = 0;
+
+    ctx->data = (uint8_t*)malloc(ring_capacity(ctx));
     if (!ctx->data) {
         return -EC_MEMFULL;
     }
 
-    ctx->size = size;
-    ctx->length = length * size;
+    memset(ctx->data, 0, ring_capacity(ctx));
 
     return EC_SUCCESS;
 }
@@ -32,24 +37,40 @@ int8_t ring_destroy(ring_t *ctx) {
     }
 
     free(ctx->data);
-}
-
-
-int8_t ring_enqueue(ring_t *ctx, uint8_t *datum) {
-    if (!ctx || !datum) {
-        return -EC_REQUIRES;
-    }
-
-    for (uint32_t bytes_written; bytes_written < ctx->size; ++bytes_written) {
-        ctx->data[ctx->write_ptr + bytes_written] = datum[bytes_written];
-    }
-
-    (ctx->write_ptr += ctx->size) % ctx->length;
+    ctx->data = nullptr;
 
     return EC_SUCCESS;
 }
 
 
-int8_t *ring_dequeue(ring_t *ctx) {
-    return nullptr;
+int8_t ring_enqueue(ring_t *ctx, const void *datum) {
+    if (!ctx || !datum) {
+        return -EC_REQUIRES;
+    }
+
+    const uint8_t *end = (uint8_t *)datum + ctx->size; 
+
+    for (const uint8_t *bytes = (uint8_t *)datum; bytes < end; ++bytes) {
+        ring_write(ctx, *bytes);
+    }
+
+    return EC_SUCCESS;
+}
+
+
+int8_t ring_dequeue(ring_t *ctx, void *read_ptr) {
+    if (!ctx || !read_ptr) {
+        return EC_REQUIRES;
+    }
+
+    const uint8_t *end = (uint8_t *)read_ptr + ctx->size;
+    for (uint8_t *trav = read_ptr; trav < end; ++trav) {
+        ring_read(ctx, (uint8_t *)trav);
+    }
+
+    return EC_SUCCESS;
+}
+
+
+int8_t ring_display(ring_t *ctx) {
 }

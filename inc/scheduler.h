@@ -11,7 +11,7 @@ extern "C" {
 
 #include "tasks.h"
 #include "conf/types.h"
-#include "utility/ring.h"
+#include "container/ring.h"
 
 /** @enum sched_error
  *  @typedef sched_error_kind
