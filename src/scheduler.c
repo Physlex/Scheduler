@@ -75,12 +75,13 @@ sched_error_kind sched_enqueue(scheduler_t *ctx, task_t *task) {
 
 void sched_run(scheduler_t *ctx) {
     while (1) {
-        task_t *task = (task_t *)ring_dequeue(&ctx->task_ring);
+        task_t task;
+        ring_dequeue(&ctx->task_ring, (void *)&task);
 
-        int8_t ts = task->stat.poll();
+        int8_t ts = task.stat.poll();
         switch (ts) {
             case TS_READY: {
-                if ( task->stat.run() < 0 ) {
+                if ( task.stat.run() < 0 ) {
                     // TODO: LOG SOME ERROR
                 }
 
@@ -97,8 +98,8 @@ void sched_run(scheduler_t *ctx) {
             }
         }
 
-        if (task->stat.poll() != TS_DONE) {
-            assert(ring_enqueue(&ctx->task_ring, (uint8_t*)task) >= 0);
+        if (task.stat.poll() != TS_DONE) {
+            assert(!ring_enqueue(&ctx->task_ring, (void *)&task));
         }
     }
 }

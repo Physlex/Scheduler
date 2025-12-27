@@ -1,0 +1,29 @@
+version = 1
+revision = 3
+requires-python = ">=3.12"
+
+[manifest]
+members = [
+    "bake",
+    "scheduler-tools",
+]
+
+[[package]]
+name = "bake"
+version = "0.1.0"
+source = { editable = "tools/bake" }
+
+[[package]]
+name = "scheduler-tools"
+version = "0.1.0"
+source = { virtual = "." }
+
+[package.dev-dependencies]
+dev = [
+    { name = "bake" },
+]
+
+[package.metadata]
+
+[package.metadata.requires-dev]
+dev = [{ name = "bake", editable = "tools/bake" }]
