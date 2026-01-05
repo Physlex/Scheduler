@@ -6,6 +6,8 @@
 echo "Installing project dependencies..."
 
 sudo apt-get install -y \
-    gcc  \
-    make \
-    cmake
+    gcc   \
+    make  \
+    cmake \
+    g++
+

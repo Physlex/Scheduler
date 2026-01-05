@@ -11,7 +11,8 @@ extern "C" {
 
 #include "tasks.h"
 #include "conf/types.h"
-#include "container/ring.h"
+
+struct ring;
 
 /** @enum sched_error
  *  @typedef sched_error_kind
@@ -40,7 +41,7 @@ typedef enum sched_error {
  *  @brief TODO: DOCS
  */
 typedef struct scheduler {
-    ring_t task_ring;
+    struct ring *task_queue;
 } scheduler_t;
 
 

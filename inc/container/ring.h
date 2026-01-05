@@ -1,82 +1,91 @@
 #ifndef SCHEDULER_CORE_CONTAINER_RING_H_
 #define SCHEDULER_CORE_CONTAINER_RING_H_
 
-/** @file `utility/ring.h`
- *  @brief TODO: DOCS
+/** @file `container/ring.h`
+ *  @brief This file implements a simple byte-level ring buffer.
+ * 
+ *         It allows queueing/dequeuing any memory type by copying it's
+ *         byte-level representation.
+ * 
+ *         The container uses a malloc'd implementation, as in the initial
+ *         construction of the ring uses a memory allocation and hence, syscall.
+ * 
+ *         To reduce overhead, the ring buffer is treated statically, meaning
+ *         unless a second ring buffer is defined, the ring buffer provided has
+ *         no built-in capability to change it's size.
  */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
 #include "conf/types.h"
 
-/** @struct ring
- *  @typedef ring_t
- *  @brief TODO: DOCS
- */
-typedef struct ring {
-    uint8_t *data;
+struct ring;
+typedef struct ring ring_t;
 
-    uint32_t write_ptr;
-    uint32_t read_ptr;
-
-    uint32_t size;
-    uint32_t length;
-} ring_t;
-
-/** @fn int8_t ring_create(ring_t *, uint32_t, uint32_t)
+/** @fn int8_t ring_create(struct ring*, uint32_t, uint32_t)
  *  @brief This function allocates resources for the ring buffer.
- * 
- *  TODO: DOCS
  */
-extern int8_t ring_create(ring_t *ctx, uint32_t length, uint32_t size);
+extern struct ring *ring_create(const uintptr_t size, const uintptr_t length);
 
-/** @fn void ring_destroy(ring_t *)
+/** @fn void ring_destroy(struct ring *)
  *  @brief This function releases the ring buffer resources.
  */
-extern int8_t ring_destroy(ring_t *ctx);
+extern int8_t ring_destroy(struct ring **ctx);
 
-/** @fn int8_t ring_enqueue(ring_t *, void *)
- *  @brief TODO: DOCS
+/** @fn int8_t ring_enqueue(struct ring *, void *)
+ *  @brief This function enqueues a single element to a ring buffer.
+ *  @param[out] ctx The ring buffer, with writable addresses.
+ *  @param[out] datum The base address of the type we are reading from.
+ *  @result An error code as defined in `errors.h`
  */
-extern int8_t ring_enqueue(ring_t *ctx, const void *datum);
+extern int8_t ring_enqueue(struct ring *ctx, const void *datum);
 
-/** @fn int8_t ring_dequeue(ring_t *)
- *  @brief TODO: DOCS
+/** @fn int8_t ring_dequeue(struct ring *, void *)
+ *  @brief This function dequeues a single element from a ring buffer.
+ *  @param[out] ctx The ring buffer, with readable addresses.
+ *  @param[out] datum The base address of the type we are reading to.
+ *  @result An error code as defined in `errors.h`
  */
-extern int8_t ring_dequeue(ring_t *ctx, void *read_ptr);
+extern int8_t ring_dequeue(struct ring *ctx, void *datum);
 
-/** @fn int8_t ring_display(ring_t *)
- *  @brief TODO: DOCS
+/**
+ * @defgroup ring_getters Ring Getters
+ * @brief This group defines extractor functions for the ring type.
+ * @{
  */
-extern int8_t ring_display(ring_t *ctx);
 
-/** @fn uint32_t ring_capacity(ring_t *)
- *  @brief TODO: DOCS
+extern uintptr_t ring_read_ptr(ring_t *ctx);
+extern uintptr_t ring_write_ptr(ring_t *ctx);
+extern uintptr_t ring_capacity(struct ring *ctx);
+
+/** @} */
+
+/** @defgroup ring_helpers Ring Helpers
+ *  @brief This group defines a set of private ring helper functions.
+ *  @{
  */
-static inline uint32_t ring_capacity(ring_t *ctx) {
-    return ctx->length * ctx->size;
-}
 
-/** @fn void *ring_read(ring_t *)
- *  @brief TODO: DOCS
+/** @fn void ring_read(const struct ring *)
+ *  @brief read a single byte from the ring buffer into the read byte pointer.
+ * 
+ *         Assumes that the maximum data representation of a given ring buffer
+ *         is a singular byte.
+ * 
+ *  @param[out] ctx The ring buffer we read from.
  */
-static inline void ring_read(ring_t *ctx, uint8_t *read_byte_ptr) {
-    *read_byte_ptr = ctx->data[ctx->read_ptr];
-    ctx->data[ctx->read_ptr] = 0;
-    (ctx->read_ptr += 1) % ring_capacity(ctx);
-}
+static void ring_read(struct ring *ctx, uint8_t *read_byte_ptr);
 
-/** @fn void ring_write(ring_t *, const uint8_t)
- *  @brief TODO: DOCS
+/** @fn void ring_write(struct ring *, const uint8_t)
+ *  @brief read a single byte from the ring buffer into the read byte pointer.
+ * 
+ *         Assumes that the maximum data representation of a given ring buffer
+ *         is a singular byte.
  */
-static inline void ring_write(ring_t *ctx, const uint8_t byte) {
-    ctx->data[ctx->write_ptr] = byte;
-    (ctx->write_ptr += 1) % ring_capacity(ctx);
-}
+static void ring_write(struct ring *ctx, const uint8_t byte);
 
+/** @} */
 
 #ifdef __cplusplus
 };

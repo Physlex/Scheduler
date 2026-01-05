@@ -14,7 +14,7 @@
 typedef struct logger {
     log_level_k level;
     int32_t fd;
-    ring_t data;
+    ring_t *data;
 } logger_t;
 
 
