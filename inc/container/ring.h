@@ -50,14 +50,26 @@ extern int8_t ring_enqueue(struct ring *ctx, const void *datum);
  */
 extern int8_t ring_dequeue(struct ring *ctx, void *datum);
 
+/** @fn bool ring_is_empty(struct ring)
+ *  @brief Checks whether the ring buffer is empty.
+ *  @result true if empty, else, false.
+ */
+extern bool ring_is_empty(struct ring *ctx);
+
+/** @fn bool ring_is_full(struct ring)
+ *  @brief Checks whether the ring buffer is full.
+ *  @result true if full, else, false.
+ */
+extern bool ring_is_full(struct ring *ctx);
+
 /**
  * @defgroup ring_getters Ring Getters
  * @brief This group defines extractor functions for the ring type.
  * @{
  */
 
-extern uintptr_t ring_read_ptr(ring_t *ctx);
-extern uintptr_t ring_write_ptr(ring_t *ctx);
+extern uintptr_t ring_read_ptr(struct ring *ctx);
+extern uintptr_t ring_write_ptr(struct ring *ctx);
 extern uintptr_t ring_capacity(struct ring *ctx);
 
 /** @} */
@@ -72,8 +84,6 @@ extern uintptr_t ring_capacity(struct ring *ctx);
  * 
  *         Assumes that the maximum data representation of a given ring buffer
  *         is a singular byte.
- * 
- *  @param[out] ctx The ring buffer we read from.
  */
 static void ring_read(struct ring *ctx, uint8_t *read_byte_ptr);
 
@@ -86,6 +96,7 @@ static void ring_read(struct ring *ctx, uint8_t *read_byte_ptr);
 static void ring_write(struct ring *ctx, const uint8_t byte);
 
 /** @} */
+
 
 #ifdef __cplusplus
 };

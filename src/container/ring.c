@@ -3,6 +3,7 @@
  */
 
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #include "container/ring.h"
@@ -35,12 +36,12 @@ ring_t *ring_create(const uintptr_t size, const uintptr_t length) {
 
     memcpy(ctx, &temp, sizeof(ring_t));
 
-    ctx->data = (uint8_t*)malloc(ring_capacity(ctx));
+    ctx->data = (uint8_t*)malloc(ctx->capacity);
     if (!ctx->data) {
         return nullptr;
     }
 
-    memset(ctx->data, 0, ring_capacity(ctx));
+    memset(ctx->data, 0, ctx->capacity);
 
     return ctx;
 }
@@ -66,6 +67,10 @@ int8_t ring_enqueue(ring_t *ctx, const void *datum) {
         return -EC_REQUIRES;
     }
 
+    if (ring_is_full(ctx)) {
+        return -EC_OVERRUN;
+    }
+
     const uint8_t *end = (uint8_t *)datum + ctx->size; 
 
     for (const uint8_t *bytes = (uint8_t *)datum; bytes < end; ++bytes) {
@@ -78,7 +83,11 @@ int8_t ring_enqueue(ring_t *ctx, const void *datum) {
 
 int8_t ring_dequeue(ring_t *ctx, void *datum) {
     if (!ctx || !datum) {
-        return EC_REQUIRES;
+        return -EC_REQUIRES;
+    }
+
+    if (ring_is_empty(ctx)) {
+        return -EC_UNDERRUN;
     }
 
     const uint8_t *end = (uint8_t *)datum + ctx->size;
@@ -90,13 +99,23 @@ int8_t ring_dequeue(ring_t *ctx, void *datum) {
 }
 
 
-uintptr_t ring_read_ptr(ring_t *ctx) {
+uintptr_t ring_read_ptr(const ring_t *ctx) {
     return ctx->read_ptr;
 }
 
 
-uintptr_t ring_write_ptr(ring_t *ctx) {
+uintptr_t ring_write_ptr(const ring_t *ctx) {
     return ctx->write_ptr;
+}
+
+
+bool ring_is_full(const ring_t *ctx) {
+    return ctx->read_ptr == ((ctx->write_ptr + ctx->size) % ctx->capacity);
+}
+
+
+bool ring_is_empty(const ring_t *ctx) {
+    return ctx->read_ptr == ctx->write_ptr;
 }
 
 
@@ -108,11 +127,10 @@ uintptr_t ring_capacity(ring_t *ctx) {
 void ring_read(ring_t *ctx, uint8_t *read_byte_ptr) {
     *read_byte_ptr = ctx->data[ctx->read_ptr];
     ctx->data[ctx->read_ptr] = 0;
-    ctx->read_ptr = (ctx->read_ptr + 1) % ring_capacity(ctx);
+    ctx->read_ptr = (ctx->read_ptr + 1) % ctx->capacity;
 }
-
 
 void ring_write(ring_t *ctx, const uint8_t byte) {
     ctx->data[ctx->write_ptr] = byte;
-    ctx->write_ptr = (ctx->write_ptr + 1) % ring_capacity(ctx);
+    ctx->write_ptr = (ctx->write_ptr + 1) % ctx->capacity;
 }
