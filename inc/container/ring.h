@@ -24,10 +24,10 @@ extern "C" {
 struct ring;
 typedef struct ring ring_t;
 
-/** @fn int8_t ring_create(struct ring*, uint32_t, uint32_t)
+/** @fn int8_t ring_new(struct ring*, uint32_t, uint32_t)
  *  @brief This function allocates resources for the ring buffer.
  */
-extern struct ring *ring_create(const uintptr_t size, const uintptr_t length);
+extern struct ring *ring_new(const uintptr_t size, const uintptr_t length);
 
 /** @fn void ring_destroy(struct ring *)
  *  @brief This function releases the ring buffer resources.
@@ -54,13 +54,13 @@ extern int8_t ring_dequeue(struct ring *ctx, void *datum);
  *  @brief Checks whether the ring buffer is empty.
  *  @result true if empty, else, false.
  */
-extern bool ring_is_empty(struct ring *ctx);
+extern bool ring_is_empty(const struct ring *ctx);
 
 /** @fn bool ring_is_full(struct ring)
  *  @brief Checks whether the ring buffer is full.
  *  @result true if full, else, false.
  */
-extern bool ring_is_full(struct ring *ctx);
+extern bool ring_is_full(const struct ring *ctx);
 
 /**
  * @defgroup ring_getters Ring Getters
@@ -68,9 +68,9 @@ extern bool ring_is_full(struct ring *ctx);
  * @{
  */
 
-extern uintptr_t ring_read_ptr(struct ring *ctx);
-extern uintptr_t ring_write_ptr(struct ring *ctx);
-extern uintptr_t ring_capacity(struct ring *ctx);
+extern uintptr_t ring_read_ptr(const struct ring *ctx);
+extern uintptr_t ring_write_ptr(const struct ring *ctx);
+extern uintptr_t ring_capacity(const struct ring *ctx);
 
 /** @} */
 

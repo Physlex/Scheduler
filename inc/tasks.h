@@ -65,24 +65,24 @@ typedef struct task simple_task_t;
  * 
  *  @return A constructed simple task.
  */
-struct task *simple_task_new(void *args, gen_callback_ptr_t cb);
+extern struct task *simple_task_new(void *args, gen_callback_ptr_t cb);
 
 /** @fn struct task *simple_task_destroy(struct task *)
  *  @brief Destroys a given simple task, freeing it's resources.
  *  @return 0 on success, else, an error code.
  */
-int8_t simple_task_destroy(struct task *ctx);
+extern int8_t simple_task_destroy(struct task *ctx);
 
 /** @fn int8_t simple_task_run(struct task *)
  *  @brief Runs the simple task, then marks the task as completed.
  */
-int8_t simple_task_run(struct task *ctx);
+extern int8_t simple_task_run(struct task *ctx);
 
 /** @fn task_poll
  *  @brief Polls a task to query if it is ready.
  *  @return positive task_state_k. On error, negative error code.
  */
-int8_t simple_task_poll(struct task *ctx);
+extern int8_t simple_task_poll(struct task *ctx);
 
 
 // PRIVATE HELPERS

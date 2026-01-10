@@ -16,6 +16,9 @@ extern "C" {
 //! @brief Forward declaration of ring type.
 struct ring;
 
+//! @brief Forward declaration of task type.
+struct task;
+
 /** @struct scheduler
  *  @brief TODO: DOCS
  */
@@ -36,7 +39,7 @@ extern struct scheduler *sched_create();
  *  @brief Enqueue a task to the scheduler for execution.
  *  TODO: DOCS
  */
-extern int8_t sched_task(struct scheduler *ctx, task_t *task);
+extern int8_t sched_task(struct scheduler *ctx, struct task *task);
 
 /** @fn void sched_run(scheduler_t *self)
  *  @brief TODO: DOCS

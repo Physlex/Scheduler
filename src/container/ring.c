@@ -23,14 +23,14 @@ struct ring {
 };
 
 
-ring_t *ring_create(const uintptr_t size, const uintptr_t length) {
+ring_t *ring_new(const uintptr_t size, const uintptr_t length) {
     ring_t *ctx = (ring_t *)malloc(sizeof(ring_t));
     if (!ctx) {
         return nullptr;
     }
 
     ring_t temp = (ring_t){
-        .size=size, .length=length, .read_ptr=0, .write_ptr=0,
+        .size=size, .length=length, .read_ptr=0, .write_ptr=1,
         .capacity=size * length, .data=nullptr
     };
 
@@ -119,7 +119,7 @@ bool ring_is_empty(const ring_t *ctx) {
 }
 
 
-uintptr_t ring_capacity(ring_t *ctx) {
+uintptr_t ring_capacity(const ring_t *ctx) {
     return ctx->capacity;
 }
 
