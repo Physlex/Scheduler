@@ -12,7 +12,7 @@ TEST(ringCreate, ringTests) {
     const uint32_t ring_size = sizeof(float32_t);
     const uint32_t ring_len = 4;
 
-    ring_t *ring = ring_create(ring_size, ring_len);
+    ring_t *ring = ring_new(ring_size, ring_len);
     ASSERT_NE(nullptr, ring);
 
     ASSERT_EQ(0, ring_destroy(&ring));
@@ -33,7 +33,7 @@ TEST(ringQueue, ringTests) {
     const uint32_t ring_len = 4;
     const uint32_t datum = 1;
 
-    ring_t *ring = ring_create(ring_size, ring_len);
+    ring_t *ring = ring_new(ring_size, ring_len);
 
     ASSERT_NE(nullptr, ring);
     ASSERT_EQ(0, ring_enqueue(ring, (void *)&datum));
@@ -41,10 +41,10 @@ TEST(ringQueue, ringTests) {
 }
 
 
-TEST(ringQueueDeque, ringTests) {
+TEST(ringQueueDequeue, ringTests) {
     const uint32_t ring_size = sizeof(float32_t);
     const uint32_t ring_len = 4;
-    ring_t *ring = ring_create(ring_size, ring_len);
+    ring_t *ring = ring_new(ring_size, ring_len);
 
     ASSERT_NE(nullptr, ring);
 
@@ -64,7 +64,7 @@ TEST(ringQueueDeque, ringTests) {
 TEST(ringUB, ringTests) {
     const uint32_t ring_size = sizeof(uint32_t);
     const uint32_t ring_len = 4;
-    ring_t *ring = ring_create(ring_size, ring_len);
+    ring_t *ring = ring_new(ring_size, ring_len);
 
     ASSERT_NE(nullptr, ring);
 
@@ -96,7 +96,7 @@ TEST(ringUB, ringTests) {
 TEST(ringUUB, ringTests) {
     const uint32_t ring_size = sizeof(float32_t);
     const uint32_t ring_len = 4;
-    ring_t *ring = ring_create(ring_size, ring_len);
+    ring_t *ring = ring_new(ring_size, ring_len);
 
     float32_t new_datum = 0.f;
 
@@ -133,7 +133,7 @@ TEST(ringLowerBoundary, ringTests) {
     const uint32_t ring_size = sizeof(float32_t);
     const uint32_t ring_len = 4;
 
-    ring_t *ring = ring_create(ring_size, ring_len);
+    ring_t *ring = ring_new(ring_size, ring_len);
     ASSERT_NE(nullptr, ring);
 
     float32_t datum = 0.f;

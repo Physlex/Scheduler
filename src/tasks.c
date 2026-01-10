@@ -24,6 +24,8 @@ simple_task_t *simple_task_new(void *args, gen_callback_ptr_t cb) {
         .task_cb=cb, .task_args=args, .poll_cb=_simple_task_poll,
         .state=TS_READY
     };
+
+    return task;
 }
 
 
@@ -42,11 +44,11 @@ int8_t simple_task_run(simple_task_t *ctx) {
         return -EC_REQUIRES;
     }
 
-    if (ctx->state == TS_READY) {
-        return _task_run((struct task *)ctx);
-    } else {
-        return EC_SUCCESS;
+    if (ctx->state != TS_READY) {
+        return -EC_MISUSE;
     }
+
+    return _task_run((struct task *)ctx);
 }
 
 
