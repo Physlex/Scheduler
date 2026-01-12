@@ -24,19 +24,24 @@ struct ring {
 
 
 ring_t *ring_new(const uintptr_t size, const uintptr_t length) {
+    if (!length) {
+        return nullptr;
+    }
+
     ring_t *ctx = (ring_t *)malloc(sizeof(ring_t));
     if (!ctx) {
         return nullptr;
     }
 
     ring_t temp = (ring_t){
-        .size=size, .length=length, .read_ptr=0, .write_ptr=1,
-        .capacity=size * length, .data=nullptr
+        .size=size, .length=length, .read_ptr=0, .write_ptr=0,
+        .capacity=size * length + size, .data=nullptr
     };
 
     memcpy(ctx, &temp, sizeof(ring_t));
 
-    ctx->data = (uint8_t*)malloc(ctx->capacity);
+    // Holds one extra element for the "sentinel" element.
+    ctx->data = (uint8_t*)malloc(ctx->capacity + size);
     if (!ctx->data) {
         return nullptr;
     }
@@ -71,7 +76,7 @@ int8_t ring_enqueue(ring_t *ctx, const void *datum) {
         return -EC_OVERRUN;
     }
 
-    const uint8_t *end = (uint8_t *)datum + ctx->size; 
+    const uint8_t *end = (uint8_t *)datum + ctx->size;
     for (const uint8_t *bytes = (uint8_t *)datum; bytes < end; ++bytes) {
         ring_write(ctx, *bytes);
     }
@@ -119,7 +124,8 @@ bool ring_is_empty(const ring_t *ctx) {
 
 
 uintptr_t ring_capacity(const ring_t *ctx) {
-    return ctx->capacity;
+    // Ignore the sentinel value...
+    return ctx->capacity - ctx->size;
 }
 
 
