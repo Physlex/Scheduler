@@ -15,8 +15,9 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 
 set(PROJECT_SRC_PATH "${PROJECT_SOURCE_DIR}/src")
 set(PROJECT_INC_PATH "${PROJECT_SOURCE_DIR}/inc")
-set(PROJECT_CONF_PATH "${PROJECT_SOURCE_DIR}/conf")
+set(PROJECT_CONF_PATH "${PROJECT_SOURCE_DIR}/cmake")
 set(PROJECT_TEST_PATH "${PROJECT_SOURCE_DIR}/test")
+set(PROJECT_EXAMPLE_PATH "${PROJECT_SOURCE_DIR}/examples")
 
 include(FetchContent)
 include(${PROJECT_CONF_PATH}/AddTests.cmake)
@@ -31,5 +32,6 @@ FetchContent_MakeAvailable(googletest)
 
 add_subdirectory(${PROJECT_SRC_PATH})
 add_subdirectory(${PROJECT_TEST_PATH})
+add_subdirectory(${PROJECT_EXAMPLE_PATH})
 
 enable_testing()

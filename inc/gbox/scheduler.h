@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 
-#include "conf/types.h"
+#include "gbox/conf/types.h"
 
 
 //! @brief Forward declaration of ring type.
@@ -27,7 +27,7 @@ typedef struct scheduler scheduler_t;
  *  @brief Initializes the scheduling subsystem.
  *  @return An error code, if the scheduler has already been initialized.
  */
-extern int8_t sched_init();
+extern int8_t sched_init(uintptr_t queue_length);
 
 /** @fn scheduler_t::ErrorKind sched_enqueu(scheduler_t *, task_t *)
  *  @brief Enqueue a task to the scheduler for execution.

@@ -6,9 +6,9 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "container/ring.h"
-#include "utility/errors.h"
-#include "conf/defs.h"
+#include "gbox/container/ring.h"
+#include "gbox/utility/errors.h"
+#include "gbox/conf/defs.h"
 
 
 struct ring {

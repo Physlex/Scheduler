@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 
-#include "container/ring.h"
+#include "gbox/container/ring.h"
 
 
 /** @enum log_level

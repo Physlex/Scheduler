@@ -7,7 +7,7 @@ extern "C" {
 
 #include <stdio.h>
 
-#include "conf/types.h"
+#include "gbox/conf/types.h"
 
 
 /** @def SYS_PANIC

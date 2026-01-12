@@ -4,8 +4,8 @@
 
 #include <gtest/gtest.h>
 
-#include "container/ring.h"
-#include "utility/errors.h"
+#include "gbox/container/ring.h"
+#include "gbox/utility/errors.h"
 
 
 TEST(ringCreate, ringTests) {

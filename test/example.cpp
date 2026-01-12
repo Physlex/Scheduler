@@ -16,7 +16,7 @@
 
 #include <sys/timerfd.h>
 
-#include "conf/types.h"
+#include "gbox/conf/types.h"
 
 
 static char *itimerspec_dump(struct itimerspec *ts);

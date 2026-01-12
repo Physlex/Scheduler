@@ -2,13 +2,13 @@
  *  @brief This file implements various task implementations.
  */
 
-#include "tasks.h"
+#include "gbox/tasks.h"
 
 #include <stdlib.h>
 
-#include "conf/defs.h"
-#include "utility/sys.h"
-#include "utility/errors.h"
+#include "gbox/conf/defs.h"
+#include "gbox/utility/sys.h"
+#include "gbox/utility/errors.h"
 
 
 typedef int8_t (*poll_callback_ptr_t)(struct task *);
