@@ -29,13 +29,17 @@ typedef double float64_t;
  *  @{
  */
 
-/** @typedef void *(*gen_callback_ptr_t)(void*)
+/** @typedef int32_t (*gen_callback_ptr_t)(void*)
  *  @brief Generic callback alias.
  *  
  *         This function alias defines a better semantic interpretation of the
  *         concept of a fully generic function definition.
+ * 
+ *         A generic callback is expected to be one-shot. That is, not
+ *         returning a structure to be seized by some controller. Instead, it
+ *         is expected to die after firing.
  */
-typedef void *(*gen_callback_ptr_t)(void*);
+typedef int32_t (*gen_callback_ptr_t)(void*);
 
 /** @} */
 

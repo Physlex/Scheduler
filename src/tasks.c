@@ -4,14 +4,20 @@
 
 #include "tasks.h"
 
+#include <stdlib.h>
+
+#include "conf/defs.h"
 #include "utility/sys.h"
 #include "utility/errors.h"
+
+
+typedef int8_t (*poll_callback_ptr_t)(struct task *);
 
 
 struct task {
     gen_callback_ptr_t task_cb;
     void *task_args;
-    task_state_k (*poll_cb)(struct task *ctx);
+    poll_callback_ptr_t poll_cb;
     task_state_k state;
 };
 
@@ -29,17 +35,21 @@ simple_task_t *simple_task_new(void *args, gen_callback_ptr_t cb) {
 }
 
 
-int8_t simple_task_destroy(simple_task_t *ctx) {
+int8_t simple_task_destroy(simple_task_t **ctx) {
     if (!ctx) {
         return -EC_REQUIRES;
     }
 
-    free(ctx);
+    if (*ctx) {
+        free(*ctx);
+        *ctx = nullptr;
+    }
+
     return EC_SUCCESS;
 }
 
 
-int8_t simple_task_run(simple_task_t *ctx) {
+int32_t simple_task_run(simple_task_t *ctx) {
     if (!ctx) {
         return -EC_REQUIRES;
     }
@@ -62,11 +72,11 @@ int8_t simple_task_poll(simple_task_t *ctx) {
 
 
 int8_t _task_poll(struct task *ctx) {
-    return ctx->poll_cb;
+    return ctx->poll_cb(ctx->task_args);
 }
 
 
-int8_t _task_run(struct task *ctx) {
+int32_t _task_run(struct task *ctx) {
     return ctx->task_cb(ctx->task_args);
 }
 

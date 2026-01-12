@@ -7,6 +7,8 @@ extern "C" {
 
 #include <conf/types.h>
 
+#include "scheduler.h"
+
 
 /** @file `tasks.h`
  *  @brief This file defines the various task definitions used by the runtime. 
@@ -67,16 +69,16 @@ typedef struct task simple_task_t;
  */
 extern struct task *simple_task_new(void *args, gen_callback_ptr_t cb);
 
-/** @fn struct task *simple_task_destroy(struct task *)
+/** @fn struct task *simple_task_destroy(struct task **)
  *  @brief Destroys a given simple task, freeing it's resources.
  *  @return 0 on success, else, an error code.
  */
-extern int8_t simple_task_destroy(struct task *ctx);
+extern int8_t simple_task_destroy(struct task **ctx);
 
-/** @fn int8_t simple_task_run(struct task *)
+/** @fn int32_t simple_task_run(struct task *)
  *  @brief Runs the simple task, then marks the task as completed.
  */
-extern int8_t simple_task_run(struct task *ctx);
+extern int32_t simple_task_run(struct task *ctx);
 
 /** @fn task_poll
  *  @brief Polls a task to query if it is ready.
@@ -92,10 +94,11 @@ extern int8_t simple_task_poll(struct task *ctx);
  */
 static int8_t _task_poll(struct task *ctx);
 
-/** @fn int8_t _task_run(struct task *)
- *  @brief Invokes a task
+/** @fn int32_t _task_run(struct task *)
+ *  @brief Invokes a task.
+ *  @return Any numerical value. Any nonzero value is an error code.
  */
-static int8_t _task_run(struct task *ctx);
+static int32_t _task_run(struct task *ctx);
 
 /** @fn int8_t _simple_task_poll(struct task *)
  *  @brief This method implements the polling task
