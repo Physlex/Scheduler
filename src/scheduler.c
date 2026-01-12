@@ -4,56 +4,73 @@
 
 #include "scheduler.h"
 
+#include <string.h>
+
+#include "tasks.h"
+
 #include "container/ring.h"
 #include "utility/errors.h"
-#include "utility/sys.h"
 #include "conf/defs.h"
 
-#include <string.h>
-#include <assert.h>
+
+struct scheduler {
+    ring_t *task_queue;
+};
 
 
-// struct scheduler {
-//     ring_t *task_queue;
-// };
+static bool _scheduler_creation_locked = false;
+static scheduler_t _scheduler;
 
 
-// scheduler_t *sched_create() {
-//     const uint32_t kilobyte = 1024;
+int8_t sched_init(uintptr_t queue_length) {
+    if (_scheduler_creation_locked) {
+        return -EC_MISUSE;
+    }
 
-//     scheduler_t *sched = malloc(sizeof(scheduler_t));
-//     *sched = (scheduler_t){ ring_create(sizeof(uintptr_t), 2 * kilobyte) };
+    _scheduler.task_queue = ring_new(simple_task_size(), queue_length);
+    _scheduler_creation_locked = true;
 
-//     return sched;
-// }
-
-
-// int8_t sched_task(scheduler_t *ctx, task_t *task) {
-//     return ring_enqueue(ctx->task_queue, task);
-// }
+    return EC_SUCCESS;
+}
 
 
-// void sched_run(scheduler_t *ctx) {
-//     ring_t *task_queue = ctx->task_queue;
-    
-//     do {
-//         task_t curr_task;
-//         int8_t ec = ring_dequeue(ctx->task_queue, (void *)&curr_task);
-//         if (ec < 0) { SYS_PANIC(-ec); }
+int8_t sched_task(struct task *task) {
+    return ring_enqueue(_scheduler.task_queue, task);
+}
 
-//         switch task_state(&curr_task) {
-//             case TS_DONE: {
-//                 break;
-//             }
-//             case TS_READY: {
-//                 break;
-//             }
-//             case TS_WAITING: {
-//                 break;
-//             }
-//             default: {
-//                 SYS_PANIC(EC_MISUSE);
-//             }
-//         }
-//     } while (ring_is_full(task_queue));
-// }
+
+int8_t sched_run() {
+    ring_t *task_queue = _scheduler.task_queue;
+
+    do {
+        simple_task_t *curr_task = nullptr;
+
+        int8_t ec = ring_dequeue(task_queue, (void *)curr_task);
+        if (ec < 0) { return ec; }
+
+        int8_t task_state = simple_task_poll(curr_task);
+        switch (task_state) {
+            case TS_DONE: {
+                // Don't put it back onto the scheduler queue
+                break;
+            }
+
+            case TS_READY: {
+                simple_task_run(curr_task);
+                break;
+            }
+
+            case TS_WAITING: {
+                ring_enqueue(task_queue, (void *)curr_task);
+                break;
+            }
+
+            default: {
+                SYS_PANIC(EC_MISUSE);
+            }
+        }
+    // TODO: Should a program exit if the task queue is empty?
+    } while (!ring_is_empty(task_queue));
+
+    return EC_SUCCESS;
+}

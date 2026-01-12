@@ -71,6 +71,11 @@ int8_t simple_task_poll(simple_task_t *ctx) {
 }
 
 
+uintptr_t simple_task_size() {
+    return sizeof(struct task);
+}
+
+
 int8_t _task_poll(struct task *ctx) {
     return ctx->poll_cb(ctx->task_args);
 }

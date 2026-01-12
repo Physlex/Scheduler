@@ -9,7 +9,6 @@
 extern "C" {
 #endif
 
-#include "tasks.h"
 #include "conf/types.h"
 
 
@@ -19,32 +18,27 @@ struct ring;
 //! @brief Forward declaration of task type.
 struct task;
 
-/** @struct scheduler
- *  @brief TODO: DOCS
- */
-struct scheduler;
-
 /** @typedef scheduler_t
  *  @brief TODO: DOCS
  */
 typedef struct scheduler scheduler_t;
 
-/** @fn int8_t sched_create(scheduler_t *)
- *  @brief Populates a scheduler struct.
- *  TODO: DOCS
+/** @fn int8_t sched_init()
+ *  @brief Initializes the scheduling subsystem.
+ *  @return An error code, if the scheduler has already been initialized.
  */
-extern struct scheduler *sched_create();
+extern int8_t sched_init();
 
 /** @fn scheduler_t::ErrorKind sched_enqueu(scheduler_t *, task_t *)
  *  @brief Enqueue a task to the scheduler for execution.
  *  TODO: DOCS
  */
-extern int8_t sched_task(struct scheduler *ctx, struct task *task);
+extern int8_t sched_task(struct task *task);
 
-/** @fn void sched_run(scheduler_t *self)
+/** @fn int8_t sched_start()
  *  @brief TODO: DOCS
  */
-extern void sched_run(scheduler_t *ctx);
+extern int8_t sched_start();
 
 
 #ifdef __cplusplus

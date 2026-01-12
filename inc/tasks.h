@@ -86,6 +86,11 @@ extern int32_t simple_task_run(struct task *ctx);
  */
 extern int8_t simple_task_poll(struct task *ctx);
 
+/** @fn uinptr_t simple_task_size()
+ *  @brief Extractor for number of bytes in a simple task struct.
+ */
+extern uintptr_t simple_task_size();
+
 
 // PRIVATE HELPERS
 
