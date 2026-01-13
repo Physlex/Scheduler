@@ -38,7 +38,7 @@ extern int8_t sched_task(struct task *task);
 /** @fn int8_t sched_start()
  *  @brief TODO: DOCS
  */
-extern int8_t sched_start();
+extern int8_t sched_run();
 
 
 #ifdef __cplusplus

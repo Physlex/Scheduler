@@ -16,3 +16,6 @@ __pycache__
 *.o
 *.out
 *.exe
+
+# Scratchpad
+scratch.txt

@@ -86,7 +86,7 @@ int8_t ring_enqueue(ring_t *ctx, const void *datum) {
 
 
 int8_t ring_dequeue(ring_t *ctx, void *datum) {
-    if (!ctx || !datum) {
+    if (!ctx) {
         return -EC_REQUIRES;
     }
 

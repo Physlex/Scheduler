@@ -1,4 +1,4 @@
-# AddExamples.cmake
+# ADDEXAMPLESamples.cmake
 #
 # This file converts a set of globbed source files into example binaries.
 
@@ -15,21 +15,22 @@ function(add_examples)
         ${ARGN}
     )
 
-    foreach(EX IN LISTS ADDEX_SOURCES)
+    message("TEST ${ADDEXAMPLES_SOURCES}")
+    message("TEST ${ADDEXAMPLES_INCLUDES}")
+    message("TEST ${ADDEXAMPLES_LIBRARIES}")
+
+    foreach(EX IN LISTS ADDEXAMPLES_SOURCES)
         cmake_path(GET EX STEM EX_NAME)
         set(RUNTIME_NAME "ex-${EX_NAME}")
 
         add_executable(${RUNTIME_NAME} ${EX})
 
         target_include_directories(
-            ${RUNTIME_NAME} PRIVATE ${ADDEX_INCLUDES}
+            ${RUNTIME_NAME} PRIVATE ${ADDEXAMPLES_INCLUDES}
         )
 
         target_link_libraries(
-            ${RUNTIME_NAME} PRIVATE ${ADDEX_LIBRARIES}
-            ${PROJECT_SOURCE_DIR}/build/lib/libgbox-core.a
+            ${RUNTIME_NAME} PRIVATE ${ADDEXAMPLES_LIBRARIES}
         )
-
-        add_EX(NAME ${RUNTIME_NAME} COMMAND ${RUNTIME_NAME})
     endforeach()
 endfunction()

@@ -21,6 +21,7 @@ set(PROJECT_EXAMPLE_PATH "${PROJECT_SOURCE_DIR}/examples")
 
 include(FetchContent)
 include(${PROJECT_CONF_PATH}/AddTests.cmake)
+include(${PROJECT_CONF_PATH}/AddExamples.cmake)
 include(GoogleTest)
 
 FetchContent_Declare(

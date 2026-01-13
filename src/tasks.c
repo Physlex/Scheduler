@@ -11,41 +11,13 @@
 #include "gbox/utility/errors.h"
 
 
-typedef int8_t (*poll_callback_ptr_t)(struct task *);
-
-
-struct task {
-    gen_callback_ptr_t task_cb;
-    void *task_args;
-    poll_callback_ptr_t poll_cb;
-    task_state_k state;
-};
-
-
-simple_task_t *simple_task_new(void *args, gen_callback_ptr_t cb) {
-    simple_task_t *task = (simple_task_t *)malloc(sizeof(simple_task_t));
-    if (!task) { SYS_PANIC(EC_MEMFULL); }
-
-    *task = (simple_task_t){
+struct task simple_task_create(void *args, gen_callback_ptr_t cb) {
+    simple_task_t task = (simple_task_t){
         .task_cb=cb, .task_args=args, .poll_cb=_simple_task_poll,
         .state=TS_READY
     };
 
     return task;
-}
-
-
-int8_t simple_task_destroy(simple_task_t **ctx) {
-    if (!ctx) {
-        return -EC_REQUIRES;
-    }
-
-    if (*ctx) {
-        free(*ctx);
-        *ctx = nullptr;
-    }
-
-    return EC_SUCCESS;
 }
 
 

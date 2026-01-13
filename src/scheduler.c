@@ -5,11 +5,13 @@
 #include "gbox/scheduler.h"
 
 #include <string.h>
+#include <stdio.h> // TODO: REMOVE
 
 #include "gbox/tasks.h"
 
 #include "gbox/container/ring.h"
 #include "gbox/utility/errors.h"
+#include "gbox/utility/sys.h"
 #include "gbox/conf/defs.h"
 
 
@@ -35,7 +37,8 @@ int8_t sched_init(uintptr_t queue_length) {
 
 
 int8_t sched_task(struct task *task) {
-    return ring_enqueue(_scheduler.task_queue, task);
+    int8_t ret = ring_enqueue(_scheduler.task_queue, task);
+    return ret;
 }
 
 
@@ -43,12 +46,12 @@ int8_t sched_run() {
     ring_t *task_queue = _scheduler.task_queue;
 
     do {
-        simple_task_t *curr_task = nullptr;
+        simple_task_t curr_task;
 
-        int8_t ec = ring_dequeue(task_queue, (void *)curr_task);
+        int8_t ec = ring_dequeue(task_queue, (void *)&curr_task);
         if (ec < 0) { return ec; }
 
-        int8_t task_state = simple_task_poll(curr_task);
+        int8_t task_state = simple_task_poll(&curr_task);
         switch (task_state) {
             case TS_DONE: {
                 // Don't put it back onto the scheduler queue
@@ -56,12 +59,12 @@ int8_t sched_run() {
             }
 
             case TS_READY: {
-                simple_task_run(curr_task);
+                simple_task_run(&curr_task);
                 break;
             }
 
             case TS_WAITING: {
-                ring_enqueue(task_queue, (void *)curr_task);
+                ring_enqueue(task_queue, (void *)&curr_task);
                 break;
             }
 
@@ -71,6 +74,9 @@ int8_t sched_run() {
         }
     // TODO: Should a program exit if the task queue is empty?
     } while (!ring_is_empty(task_queue));
+
+    _scheduler_creation_locked = false;
+    ring_destroy(&_scheduler.task_queue);
 
     return EC_SUCCESS;
 }

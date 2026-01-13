@@ -45,20 +45,30 @@ typedef enum task_state {
     TS_DONE
 } task_state_k;
 
+/** @typedef poll_callback_ptr_t
+ *  @brief TODO: DOCS
+ */
+typedef int8_t (*poll_callback_ptr_t)(struct task *);
+
 /** @struct task
  *  @brief Simple task definition. Wraps a generic callback pointer and tracks
  *         state.
  *
  *  TODO: DOCS
  */
-struct task;
+struct task {
+    gen_callback_ptr_t task_cb;
+    void *task_args;
+    poll_callback_ptr_t poll_cb;
+    task_state_k state;
+};
 
 /** @typedef simple_task_t
  *  @brief Alias to a generic task. Simplest possible task defintion.
  */
 typedef struct task simple_task_t;
 
-/** @fn struct task simple_task_new(void *)
+/** @fn struct task simple_task_create(void *)
  *  @brief Simple task creation utility. Takes a set of args and 'hooks' into
  *         scheduler.
  *  @param args The arguments provided on startup to the simple task.
@@ -66,13 +76,7 @@ typedef struct task simple_task_t;
  * 
  *  @return A constructed simple task.
  */
-extern struct task *simple_task_new(void *args, gen_callback_ptr_t cb);
-
-/** @fn struct task *simple_task_destroy(struct task **)
- *  @brief Destroys a given simple task, freeing it's resources.
- *  @return 0 on success, else, an error code.
- */
-extern int8_t simple_task_destroy(struct task **ctx);
+extern struct task simple_task_create(void *args, gen_callback_ptr_t cb);
 
 /** @fn int32_t simple_task_run(struct task *)
  *  @brief Runs the simple task, then marks the task as completed.
