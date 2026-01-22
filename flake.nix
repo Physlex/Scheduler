@@ -2,23 +2,27 @@
   description = "Nix package management for the gbox framework";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
   };
 
   outputs = { self, nixpkgs }: 
     let
       system = "x86_64-linux";  # adjust if needed
       pkgs = import nixpkgs { inherit system; };
-    in
-    {
+    in {
       devShells.${system}.default = pkgs.mkShell {
-        buildInputs = [
-          pkgs.cmake
-          pkgs.gnumake
-          pkgs.gcc
-          pkgs.gtest
-          pkgs.gpp
+        packages = with pkgs; [
+          clang
+          clang-tools
+          ninja
+          gdb
+          gtest
         ];
+
+        shellHook = ''
+          echo "Nix development environment initialized."
+          cmake -B build -S . -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/clang-toolchain.cmake
+        '';
       };
     };
 }

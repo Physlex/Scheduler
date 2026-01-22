@@ -3,6 +3,7 @@
  */
 
 #include "gbox/utility/errors.h"
+#include "gbox/conf/defs.h"
 
 
 static const char *requires_message =
@@ -17,11 +18,14 @@ static const char *memfull_message = "Unable to allocate more OS memory.";
 
 
 const char *code_into_error_msg(error_code_k code) {
+    const char *message = nullptr;
     switch (code) {
-        case EC_SUCCESS: return success_message;
-        case EC_REQUIRES: return requires_message;
-        case EC_MEMFULL: return memfull_message;
-        case EC_MISUSE: return misuse_message;
+        case EC_SUCCESS: message = success_message;
+        case EC_REQUIRES: message = requires_message;
+        case EC_MEMFULL: message = memfull_message;
+        case EC_MISUSE: message = misuse_message;
         default: error_panic(code);
     }
+
+    return message;
 }

@@ -4,11 +4,6 @@
 cmake_minimum_required(VERSION 3.28.3)
 project(gbox VERSION 0.1.0 LANGUAGES C CXX)
 
-set(CMAKE_C_STANDARD 23)
-set(CMAKE_C_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
@@ -22,6 +17,11 @@ set(PROJECT_EXAMPLE_PATH "${PROJECT_SOURCE_DIR}/examples")
 include(FetchContent)
 include(${PROJECT_CONF_PATH}/AddTests.cmake)
 include(${PROJECT_CONF_PATH}/AddExamples.cmake)
+
+if(NOT CMAKE_C_COMPILER MATCHES "clang" OR NOT CMAKE_CXX_COMPILER MATCHES clang\\+\\+)
+    message(FATAL_ERROR "clang improperly installed. Did you use `nix develop`?")
+endif()
+
 include(GoogleTest)
 
 FetchContent_Declare(
