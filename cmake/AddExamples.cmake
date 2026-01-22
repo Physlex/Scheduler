@@ -15,10 +15,6 @@ function(add_examples)
         ${ARGN}
     )
 
-    message("TEST ${ADDEXAMPLES_SOURCES}")
-    message("TEST ${ADDEXAMPLES_INCLUDES}")
-    message("TEST ${ADDEXAMPLES_LIBRARIES}")
-
     foreach(EX IN LISTS ADDEXAMPLES_SOURCES)
         cmake_path(GET EX STEM EX_NAME)
         set(RUNTIME_NAME "ex-${EX_NAME}")
