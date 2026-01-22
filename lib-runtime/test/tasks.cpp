@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "gbox/tasks.h"
+#include "gbox/runtime/tasks.h"
 
 /** @defgroup simple task callback simpleTaskCallbacks
  *  @brief This group defines a set of callbacks to be used during tests.

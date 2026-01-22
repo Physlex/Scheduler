@@ -2,17 +2,17 @@
  *  @brief This file implements the `scheduler` subsystem.
  */
 
-#include "gbox/scheduler.h"
+#include "gbox/runtime/scheduler.h"
 
 #include <string.h>
 #include <stdio.h> // TODO: REMOVE
 
-#include "gbox/tasks.h"
+#include "gbox/runtime/tasks.h"
 
-#include "gbox/container/ring.h"
-#include "gbox/utility/errors.h"
-#include "gbox/utility/sys.h"
-#include "gbox/conf/defs.h"
+#include "gbox/runtime/container/ring.h"
+#include "gbox/runtime/utility/errors.h"
+#include "gbox/runtime/utility/sys.h"
+#include "gbox/runtime/conf/defs.h"
 
 
 struct scheduler {

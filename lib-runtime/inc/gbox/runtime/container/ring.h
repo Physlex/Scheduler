@@ -19,7 +19,7 @@
 extern "C" {
 #endif
 
-#include "gbox/conf/types.h"
+#include "gbox/runtime/conf/types.h"
 
 struct ring;
 typedef struct ring ring_t;

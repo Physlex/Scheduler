@@ -2,8 +2,8 @@
  *  @brief This file implements the functions defined in `utility/errors.h`
  */
 
-#include "gbox/utility/errors.h"
-#include "gbox/conf/defs.h"
+#include "gbox/runtime/utility/errors.h"
+#include "gbox/runtime/conf/defs.h"
 
 
 static const char *requires_message =

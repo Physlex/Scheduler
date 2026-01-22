@@ -5,9 +5,9 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include <gbox/scheduler.h>
-#include <gbox/tasks.h>
-#include <gbox/utility/errors.h>
+#include <gbox/runtime/scheduler.h>
+#include <gbox/runtime/tasks.h>
+#include <gbox/runtime/utility/errors.h>
 
 
 static inline int32_t hello_msg(void *low_level_msg) {

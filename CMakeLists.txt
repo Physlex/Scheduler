@@ -8,10 +8,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 
-set(PROJECT_SRC_PATH "${PROJECT_SOURCE_DIR}/src")
-set(PROJECT_INC_PATH "${PROJECT_SOURCE_DIR}/inc")
 set(PROJECT_CONF_PATH "${PROJECT_SOURCE_DIR}/cmake")
-set(PROJECT_TEST_PATH "${PROJECT_SOURCE_DIR}/test")
 set(PROJECT_EXAMPLE_PATH "${PROJECT_SOURCE_DIR}/examples")
 
 include(FetchContent)
@@ -29,10 +26,13 @@ FetchContent_Declare(
   URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
 )
 
-FetchContent_MakeAvailable(googletest)
+set(GBOX_MACROS_PATH ${PROJECT_SOURCE_DIR}/lib-macros)
+set(GBOX_RUNTIME_PATH ${PROJECT_SOURCE_DIR}/lib-runtime)
 
-add_subdirectory(${PROJECT_SRC_PATH})
-add_subdirectory(${PROJECT_TEST_PATH})
+add_subdirectory(${GBOX_MACROS_PATH})
+add_subdirectory(${GBOX_RUNTIME_PATH})
 add_subdirectory(${PROJECT_EXAMPLE_PATH})
+
+FetchContent_MakeAvailable(googletest)
 
 enable_testing()

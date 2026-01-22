@@ -2,13 +2,13 @@
  *  @brief This file implements various task implementations.
  */
 
-#include "gbox/tasks.h"
+#include "gbox/runtime/tasks.h"
 
 #include <stdlib.h>
 
-#include "gbox/conf/defs.h"
-#include "gbox/utility/sys.h"
-#include "gbox/utility/errors.h"
+#include "gbox/runtime/conf/defs.h"
+#include "gbox/runtime/utility/sys.h"
+#include "gbox/runtime/utility/errors.h"
 
 
 struct task simple_task_create(void *args, gen_callback_ptr_t cb) {

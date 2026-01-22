@@ -5,8 +5,8 @@
 extern "C" {
 #endif
 
-#include "gbox/conf/types.h"
-#include "gbox/scheduler.h"
+#include "gbox/runtime/conf/types.h"
+#include "gbox/runtime/scheduler.h"
 
 
 /** @file `tasks.h`
