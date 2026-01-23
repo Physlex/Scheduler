@@ -42,11 +42,12 @@ extern int8_t ring_destroy(struct ring **ctx);
  */
 extern int8_t ring_enqueue(struct ring *ctx, const void *datum);
 
-/** @fn int8_t ring_dequeue(struct ring *, void *)
+/** @fn void *ring_dequeue(struct ring *)
  *  @brief This function dequeues a single element from a ring buffer.
  *  @param[out] ctx The ring buffer, with readable addresses.
  *  @param[out] datum The base address of the type we are reading to.
  *  @result An error code as defined in `errors.h`
+ *  TODO: DOCS
  */
 extern int8_t ring_dequeue(struct ring *ctx, void *datum);
 

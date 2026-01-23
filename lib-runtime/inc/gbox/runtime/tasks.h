@@ -45,10 +45,21 @@ typedef enum task_state {
     TS_DONE
 } task_state_k;
 
+struct task_if;
+
 /** @typedef poll_callback_ptr_t
  *  @brief TODO: DOCS
  */
 typedef int8_t (*poll_callback_ptr_t)(struct task *);
+
+/** @struct task_if
+ *  @typedef task_if_t
+ *  @brief Virtual interface for tasks.
+ */
+typedef struct task_if {
+    gen_callback_ptr_t run;
+    poll_callback_ptr_t poll;
+} task_if_t;
 
 /** @struct task
  *  @brief Simple task definition. Wraps a generic callback pointer and tracks
@@ -56,62 +67,55 @@ typedef int8_t (*poll_callback_ptr_t)(struct task *);
  *
  *  TODO: DOCS
  */
-struct task {
-    gen_callback_ptr_t task_cb;
-    void *task_args;
-    poll_callback_ptr_t poll_cb;
+typedef struct task {
+    task_if_t interface;
+    void *args;
     task_state_k state;
-};
+} task_t;
 
-/** @typedef simple_task_t
+/** @typedef task_t
  *  @brief Alias to a generic task. Simplest possible task defintion.
  */
-typedef struct task simple_task_t;
+typedef struct task task_t;
 
-/** @fn struct task simple_task_create(void *)
- *  @brief Simple task creation utility. Takes a set of args and 'hooks' into
- *         scheduler.
- *  @param args The arguments provided on startup to the simple task.
- *  @param cb The function pointer implementation used in the callback.
- * 
- *  @return A constructed simple task.
+/** @fn struct task simple_task_create(gen_callback_ptr_t, void *)
+ *  @brief TODO: DOCS
  */
-extern struct task simple_task_create(void *args, gen_callback_ptr_t cb);
+extern struct task simple_task_create(gen_callback_ptr_t run, void *args);
 
-/** @fn int32_t simple_task_run(struct task *)
+/** @fn int32_t task_run(struct task *)
  *  @brief Runs the simple task, then marks the task as completed.
  */
-extern int32_t simple_task_run(struct task *ctx);
+extern int32_t task_run(struct task *ctx);
 
 /** @fn task_poll
  *  @brief Polls a task to query if it is ready.
  *  @return positive task_state_k. On error, negative error code.
  */
-extern int8_t simple_task_poll(struct task *ctx);
+extern int8_t task_poll(struct task *task);
 
-/** @fn uinptr_t simple_task_size()
+/** @fn uinptr_t task_size()
  *  @brief Extractor for number of bytes in a simple task struct.
  */
-extern uintptr_t simple_task_size();
+extern uintptr_t task_size();
 
-
-// PRIVATE HELPERS
-
-/** @fn int8_t _task_poll(struct task *)
- *  @brief This method implements a generic polling structure for all tasks.
+/** @fn task_if(struct task_if *)
+ *  @brief Extractor for task interface.
  */
-static int8_t _task_poll(struct task *ctx);
+extern const struct task_if task_if(struct task *task);
 
-/** @fn int32_t _task_run(struct task *)
- *  @brief Invokes a task.
- *  @return Any numerical value. Any nonzero value is an error code.
+/** @fn struct task task_create(const task_if_t interface, void *args)
+ *  @brief Simple task creation utility. Takes a set of args and 'hooks' into
+ *         scheduler.
+ * 
+ *  @param[in] task_if Interface definition for a simple task.
+ *  @param args The arguments provided on startup to the simple task.
+ * 
+ *  @return A constructed simple task.
+ * 
+ *  TODO: DOCS
  */
-static int32_t _task_run(struct task *ctx);
-
-/** @fn int8_t _simple_task_poll(struct task *)
- *  @brief This method implements the polling task
- */
-static int8_t _simple_task_poll(struct task *ctx);
+static struct task task_create(const task_if_t interface, void *args);
 
 
 #ifdef __cplusplus

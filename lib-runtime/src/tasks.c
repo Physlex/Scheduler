@@ -11,17 +11,27 @@
 #include "gbox/runtime/utility/errors.h"
 
 
-struct task simple_task_create(void *args, gen_callback_ptr_t cb) {
-    simple_task_t task = (simple_task_t){
-        .task_cb=cb, .task_args=args, .poll_cb=_simple_task_poll,
-        .state=TS_READY
+static inline int8_t _simple_poll(task_t *ctx) {
+    ctx->state = TS_READY;
+    return TS_READY;
+}
+
+
+struct task simple_task_create(const gen_callback_ptr_t run, void *args) {
+    return task_create((task_if_t){ .run=run, .poll=_simple_poll }, args);
+}
+
+
+struct task task_create(const task_if_t interface, void *args) {
+    task_t task = (task_t){
+        .interface=interface, .args=args, .state=TS_WAITING
     };
 
     return task;
 }
 
 
-int32_t simple_task_run(simple_task_t *ctx) {
+int32_t task_run(task_t *ctx) {
     if (!ctx) {
         return -EC_REQUIRES;
     }
@@ -30,35 +40,24 @@ int32_t simple_task_run(simple_task_t *ctx) {
         return -EC_MISUSE;
     }
 
-    return _task_run((struct task *)ctx);
+    return ctx->interface.run(ctx->args);
 }
 
 
-int8_t simple_task_poll(simple_task_t *ctx) {
+int8_t task_poll(task_t *ctx) {
     if (!ctx) {
         return -EC_REQUIRES;
     }
 
-    return _task_poll((struct task *)ctx);
+    return ctx->interface.poll(ctx);
 }
 
 
-uintptr_t simple_task_size() {
+uintptr_t task_size() {
     return sizeof(struct task);
 }
 
 
-int8_t _task_poll(struct task *ctx) {
-    return ctx->poll_cb(ctx->task_args);
-}
-
-
-int32_t _task_run(struct task *ctx) {
-    return ctx->task_cb(ctx->task_args);
-}
-
-
-int8_t _simple_task_poll(simple_task_t *ctx) {
-    // Simple tasks are automatically invoked the moment they are ready.
-    return TS_READY;
+const task_if_t task_if(task_t *task) {
+    return task->interface;
 }
