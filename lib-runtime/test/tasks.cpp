@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "gbox/tasks.h"
+#include "gbox/runtime/tasks.h"
 
 /** @defgroup simple task callback simpleTaskCallbacks
  *  @brief This group defines a set of callbacks to be used during tests.
@@ -20,8 +20,8 @@ int32_t hello_world(void *args) {
 
 
 TEST(simpleTaskCall, simpleTaskTests) {
-    simple_task_t stask = simple_task_create(nullptr, hello_world);
+    task_t stask = simple_task_create(hello_world, nullptr);
 
-    ASSERT_EQ(TS_READY, simple_task_poll(&stask));
-    ASSERT_EQ(0, simple_task_run(&stask));
+    ASSERT_EQ(TS_READY, task_poll(&stask));
+    ASSERT_EQ(0, task_run(&stask));
 }

@@ -5,6 +5,6 @@
 
 #include <gtest/gtest.h>
 
-#include "gbox/scheduler.h"
+#include "gbox/runtime/scheduler.h"
 
 

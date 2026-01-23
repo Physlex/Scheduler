@@ -6,9 +6,9 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "gbox/container/ring.h"
-#include "gbox/utility/errors.h"
-#include "gbox/conf/defs.h"
+#include "gbox/runtime/container/ring.h"
+#include "gbox/runtime/utility/errors.h"
+#include "gbox/runtime/conf/defs.h"
 
 
 struct ring {
@@ -86,7 +86,7 @@ int8_t ring_enqueue(ring_t *ctx, const void *datum) {
 
 
 int8_t ring_dequeue(ring_t *ctx, void *datum) {
-    if (!ctx) {
+    if (!ctx || !datum) {
         return -EC_REQUIRES;
     }
 

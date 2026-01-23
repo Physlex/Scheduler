@@ -2,17 +2,16 @@
  *  @brief This file implements the `scheduler` subsystem.
  */
 
-#include "gbox/scheduler.h"
+#include "gbox/runtime/scheduler.h"
 
 #include <string.h>
-#include <stdio.h> // TODO: REMOVE
+#include <stdlib.h>
 
-#include "gbox/tasks.h"
-
-#include "gbox/container/ring.h"
-#include "gbox/utility/errors.h"
-#include "gbox/utility/sys.h"
-#include "gbox/conf/defs.h"
+#include "gbox/runtime/tasks.h"
+#include "gbox/runtime/container/ring.h"
+#include "gbox/runtime/utility/errors.h"
+#include "gbox/runtime/utility/sys.h"
+#include "gbox/runtime/conf/defs.h"
 
 
 struct scheduler {
@@ -29,7 +28,7 @@ int8_t sched_init(uintptr_t queue_length) {
         return -EC_MISUSE;
     }
 
-    _scheduler.task_queue = ring_new(simple_task_size(), queue_length);
+    _scheduler.task_queue = ring_new(task_size(), queue_length);
     _scheduler_creation_locked = true;
 
     return EC_SUCCESS;
@@ -46,12 +45,11 @@ int8_t sched_run() {
     ring_t *task_queue = _scheduler.task_queue;
 
     do {
-        simple_task_t curr_task;
+        task_t curr_task;
+        int8_t ec = ring_dequeue(task_queue, &curr_task);
+        if (ec < 0) { return -EC_MISUSE; }
 
-        int8_t ec = ring_dequeue(task_queue, (void *)&curr_task);
-        if (ec < 0) { return ec; }
-
-        int8_t task_state = simple_task_poll(&curr_task);
+        int8_t task_state = task_poll(&curr_task);
         switch (task_state) {
             case TS_DONE: {
                 // Don't put it back onto the scheduler queue
@@ -59,7 +57,7 @@ int8_t sched_run() {
             }
 
             case TS_READY: {
-                simple_task_run(&curr_task);
+                task_run(&curr_task);
                 break;
             }
 

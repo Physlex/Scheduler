@@ -2,9 +2,9 @@
  *  @brief Logging utility implementation.
  */
 
-#include "gbox/utility/logger.h"
-#include "gbox/container/ring.h"
-#include "gbox/utility/errors.h"
+#include "gbox/runtime/utility/logger.h"
+#include "gbox/runtime/container/ring.h"
+#include "gbox/runtime/utility/errors.h"
 
 
 /** @struct logger

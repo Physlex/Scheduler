@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 
-#include "gbox/conf/types.h"
+#include "gbox/runtime/conf/types.h"
 
 
 //! @brief Forward declaration of ring type.
