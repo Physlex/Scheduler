@@ -14,13 +14,13 @@ set(PROJECT_EXAMPLE_PATH "${PROJECT_SOURCE_DIR}/examples")
 include(FetchContent)
 include(${PROJECT_CONF_PATH}/AddTests.cmake)
 include(${PROJECT_CONF_PATH}/AddExamples.cmake)
+include(${PROJECT_CONF_PATH}/AddLLVM.cmake)
 
 if(NOT CMAKE_C_COMPILER MATCHES "clang" OR NOT CMAKE_CXX_COMPILER MATCHES clang\\+\\+)
     message(FATAL_ERROR "clang improperly installed. Did you use `nix develop`?")
 endif()
 
 include(GoogleTest)
-
 FetchContent_Declare(
   googletest
   URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
