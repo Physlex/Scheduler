@@ -13,19 +13,17 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 set(PROJECT_CONF_PATH "${PROJECT_SOURCE_DIR}/cmake")
 set(PROJECT_EXAMPLE_PATH "${PROJECT_SOURCE_DIR}/examples")
 
-include(FetchContent)
 include(${PROJECT_CONF_PATH}/AddTests.cmake)
 include(${PROJECT_CONF_PATH}/AddExamples.cmake)
+include(${PROJECT_CONF_PATH}/AddCustomTargets.cmake)
 
 if(NOT CMAKE_C_COMPILER MATCHES "clang" OR NOT CMAKE_CXX_COMPILER MATCHES clang\\+\\+)
     message(FATAL_ERROR "clang improperly installed. Did you use `nix develop`?")
 endif()
 
+find_package(GTest REQUIRED)
 include(GoogleTest)
-FetchContent_Declare(
-  googletest
-  URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
-)
+enable_testing()
 
 set(GBOX_MACROS_PATH ${PROJECT_SOURCE_DIR}/lib-macros)
 set(GBOX_RUNTIME_PATH ${PROJECT_SOURCE_DIR}/lib-runtime)
@@ -33,7 +31,3 @@ set(GBOX_RUNTIME_PATH ${PROJECT_SOURCE_DIR}/lib-runtime)
 add_subdirectory(${GBOX_MACROS_PATH})
 add_subdirectory(${GBOX_RUNTIME_PATH})
 add_subdirectory(${PROJECT_EXAMPLE_PATH})
-
-FetchContent_MakeAvailable(googletest)
-
-enable_testing()

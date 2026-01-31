@@ -30,7 +30,9 @@
         export LLVM_DIR=${pkgs.llvmPackages.llvm.dev}/lib/cmake/llvm
         export Clang_DIR=${pkgs.llvmPackages.libclang.dev}/lib/cmake/clang
         echo "Nix development environment initialized."
-        cmake -B build -S . -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/clang-toolchain.cmake
+        cmake -B build -S . -G Ninja \
+          -DCMAKE_TOOLCHAIN_FILE=cmake/clang-toolchain.cmake \
+          -DCMAKE_EXPORT_COMPILE_COMMANDS=On
       '';
     };
   };

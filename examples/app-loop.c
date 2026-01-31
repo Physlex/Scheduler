@@ -2,24 +2,21 @@
  *  @brief This file implements a simple runtime loop using the gbox core lib.
  */
 
-#include <stdint.h>
-#include <stdio.h>
-
 #include <gbox/runtime/scheduler.h>
 #include <gbox/runtime/tasks.h>
 #include <gbox/runtime/utility/errors.h>
+#include <stdint.h>
+#include <stdio.h>
 
-
-static inline int32_t hello_msg(void *low_level_msg) {
+static inline int32_t hello_msg(void* low_level_msg) {
     if (!low_level_msg) {
         return -EC_REQUIRES;
     }
 
-    printf("Hello, %s!\n", (const char *)low_level_msg);
+    printf("Hello, %s!\n", (const char*)low_level_msg);
 
     return EC_SUCCESS;
 }
-
 
 int32_t main(int32_t argc, char** argv) {
     uint32_t maximum_num_tasks = 100;

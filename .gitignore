@@ -7,7 +7,6 @@ build/
 # Python build system
 .venv
 .python-version
-.*
 __pycache__
 *.egg-info
 

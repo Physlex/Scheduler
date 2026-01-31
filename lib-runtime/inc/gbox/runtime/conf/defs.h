@@ -18,7 +18,6 @@ extern "C" {
 #define nullptr 0
 #endif
 
-
 #ifdef __cplusplus
 }
 #endif
