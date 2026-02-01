@@ -11,7 +11,6 @@ extern "C" {
 
 #include "gbox/runtime/conf/types.h"
 
-
 //! @brief Forward declaration of ring type.
 struct ring;
 
@@ -33,13 +32,12 @@ extern int8_t sched_init(uintptr_t queue_length);
  *  @brief Enqueue a task to the scheduler for execution.
  *  TODO: DOCS
  */
-extern int8_t sched_task(struct task *task);
+extern int8_t sched_task(struct task* task);
 
 /** @fn int8_t sched_start()
  *  @brief TODO: DOCS
  */
 extern int8_t sched_run();
-
 
 #ifdef __cplusplus
 };

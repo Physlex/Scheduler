@@ -3,8 +3,6 @@
  *         component.
  */
 
-#include <gtest/gtest.h>
-
 #include "gbox/runtime/scheduler.h"
 
-
+#include <gtest/gtest.h>
