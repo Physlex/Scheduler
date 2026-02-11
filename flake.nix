@@ -33,6 +33,7 @@
         cmake -B build -S . -G Ninja \
           -DCMAKE_TOOLCHAIN_FILE=cmake/clang-toolchain.cmake \
           -DCMAKE_EXPORT_COMPILE_COMMANDS=On
+        ln -s ./build/compile_commands.json ./build/
       '';
     };
   };
