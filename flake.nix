@@ -12,11 +12,11 @@
   in {
     devShells.${system}.default = pkgs.mkShell {
       buildInputs = with pkgs; [
-        llvmPackages.llvm
-        llvmPackages.clang
-        llvmPackages.libclang.dev
-        llvmPackages.libclang.lib
-        llvmPackages.llvm.dev
+        llvmPackages_latest.llvm
+        llvmPackages_latest.clang
+        llvmPackages_latest.libclang.dev
+        llvmPackages_latest.libclang.lib
+        llvmPackages_latest.llvm.dev
         gdb
         gtest
       ];
@@ -33,6 +33,7 @@
         cmake -B build -S . -G Ninja \
           -DCMAKE_TOOLCHAIN_FILE=cmake/clang-toolchain.cmake \
           -DCMAKE_EXPORT_COMPILE_COMMANDS=On
+        ln -s ./build/compile_commands.json ./build/
       '';
     };
   };
