@@ -5,7 +5,7 @@
  *  @brief TODO: DOCS
  */
 
-#define async [[gbox::async]]
+#define async [[clang::annotate("async")]]
 
 // TODO: IMPLEMENTATION
 #define await(group_decl)

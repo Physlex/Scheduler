@@ -2,22 +2,22 @@
  *  @brief This file implements a simple runtime loop using the gbox core lib.
  */
 
-#include <stdint.h>
-#include <stdio.h>
-
 #include <gbox/runtime/scheduler.h>
 #include <gbox/runtime/tasks.h>
 #include <gbox/runtime/utility/errors.h>
+#include <stdint.h>
+#include <stdio.h>
+
 #include <gbox/macros/async.hpp>
 
-struct user_main_task_args  { int32_t argc; char **argv; };
-struct user_main_task_rtype { int32_t rvalue; };
+struct user_main_task_args {
+    int32_t argc;
+    char** argv;
+};
 
-// This should eventually be generated out by the preprocessor.
-static struct user_main_task_rtype user_main_rtype;
-
-// This should really be something that can be automatically "reinterpreted" and type-specified
-[[gbox::task]]
+// This should really be something that can be automatically "reinterpreted" and
+// type-specified
+[[clang::annotate("task")]]
 async static inline int32_t hello_msg(void* low_level_msg) {
     if (!low_level_msg) {
         return -EC_REQUIRES;
@@ -28,9 +28,12 @@ async static inline int32_t hello_msg(void* low_level_msg) {
     return EC_SUCCESS;
 }
 
-/// Meanwhile, this will be the original "main", which is generated via attribute
-[[gbox::runtime]]
-async int32_t main(int32_t argc, char **argv) {
+/// Meanwhile, this will be the original "main", which is generated via
+/// attribute
+[[clang::annotate("executor")]]
+async int32_t user_main(void* args) {
+    struct user_main_task_args args_actual = *(struct user_main_task_args*)args;
+
     task_t task_0 = simple_task_create(hello_msg, "Hello");
     task_t task_1 = simple_task_create(hello_msg, "World");
 
@@ -46,23 +49,26 @@ async int32_t main(int32_t argc, char **argv) {
         return 1;
     }
 
-    // And we don't really need to run any task, the one's queued just "magically run"
+    // And we don't really need to run any task, the one's queued just
+    // "magically run"
 
     // TODO: Currently doesn't do anything except yield to the scheduler.
     //       Honestly, the runtime is currently: "async without await"
     return 0;
 }
 
-/// In theory, this will eventually be generated boilerplate for the "true" entrypoint
-// async int32_t main(int32_t argc, char** argv) {
-//     uint32_t maximum_num_tasks = 100;
-//     sched_init(maximum_num_tasks);
+// In theory, this will eventually be generated boilerplate for the "true"
+// entrypoint
+async int32_t main(int32_t argc, char** argv) {
+    uint32_t maximum_num_tasks = 100;
+    sched_init(maximum_num_tasks);
 
-//     struct user_main_task_args user_main_args = {.argc=argc, .argv=argv};
-//     task_t user_main_task = simple_task_create(user_main, (void*)&user_main_args);
-//     sched_task(&user_main_task);
+    struct user_main_task_args user_main_args = {.argc = argc, .argv = argv};
+    task_t user_main_task =
+        simple_task_create(user_main, (void*)&user_main_args);
+    sched_task(&user_main_task);
 
-//     // Ideally, we should be able to yield tasks early and return their result,
-//     // instead of ignore all return types.
-//     return -sched_run();
-// }
+    // Ideally, we should be able to yield tasks early and return their result,
+    // instead of ignore all return types.
+    return -sched_run();
+}

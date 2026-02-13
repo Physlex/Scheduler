@@ -5,67 +5,58 @@
  *  @brief TODO: DOCS
  */
 
-#include <clang/Frontend/FrontendAction.h>
-#include <clang/Frontend/FrontendPluginRegistry.h>
-#include <clang/AST/RecursiveASTVisitor.h>
 #include <clang/AST/ASTConsumer.h>
 #include <clang/AST/ASTContext.h>
 #include <clang/AST/Attr.h>
+#include <clang/AST/RecursiveASTVisitor.h>
+#include <clang/Frontend/FrontendAction.h>
+#include <clang/Frontend/FrontendPluginRegistry.h>
 
-class FindMyAttributeVisitor : public clang::RecursiveASTVisitor<FindMyAttributeVisitor> {
-public:
-    explicit FindMyAttributeVisitor(clang::ASTContext &ctx) : ctx(ctx) {}
+using namespace clang;
+using namespace clang::tooling;
+using namespace llvm;
 
-    bool VisitAttr(clang::Attr *attr) {
-        // Print any attribute
+class FindMyAttributeVisitor
+    : public RecursiveASTVisitor<FindMyAttributeVisitor> {
+   public:
+    FindMyAttributeVisitor(ASTContext& ctx) : ctx(ctx) {}
+
+    // Visit an attribute.
+    bool VisitAttr(Attr* attr) {
         attr->printPretty(llvm::outs(), ctx.getPrintingPolicy());
-        llvm::outs() << "\n";
         return true;
     }
 
-private:
-    clang::ASTContext &ctx;
+   private:
+    ASTContext& ctx;
 };
 
-class FindMyAttributeConsumer : public clang::ASTConsumer {
-public:
-    explicit FindMyAttributeConsumer(clang::ASTContext &ctx) : visitor(ctx) {}
-
-    void HandleTranslationUnit(clang::ASTContext &ctx) override {
+class FindMyAttributeConsumer : public ASTConsumer {
+   public:
+    virtual void HandleTranslationUnit(ASTContext& ctx) {
+        FindMyAttributeVisitor visitor(ctx);
         visitor.TraverseDecl(ctx.getTranslationUnitDecl());
     }
-
-private:
-    FindMyAttributeVisitor visitor;
 };
 
-class FindMyAttributeAction : public clang::ASTFrontendAction {
-public:
-    std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(
-        clang::CompilerInstance &CI, llvm::StringRef InFile
-    ) override {
-        return std::make_unique<FindMyAttributeConsumer>(CI.getASTContext());
+class FindMyAttributeAction : public ASTFrontendAction {
+   public:
+    virtual std::unique_ptr<ASTConsumer> CreateASTConsumer(
+        CompilerInstance& Compiler, StringRef InFile) {
+        return std::make_unique<FindMyAttributeConsumer>();
     }
 };
 
-/** @struct GBoxPlugins
- *  @brief TODO: DOCS
- */
-class GBoxPlugin : public clang::PluginASTAction {
-    std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(
-        clang::CompilerInstance &CI, llvm::StringRef InFile
-    ) override {
-        return std::make_unique<FindMyAttributeConsumer>(CI.getASTContext());
-    }
+struct ExampleAttributeInfo : public ParsedAttrInfo {
+    ExampleAttributeInfo() {
+        static constexpr Spelling attrib_spellings[3] = {
+            {ParsedAttr::AS_CXX11, "runtime"},
+            {ParsedAttr::AS_C23, "gbox::runtime"},
+            {ParsedAttr::AS_GNU, "runtime"},
+        };
 
-    bool ParseArgs(
-        const clang::CompilerInstance &CI, const std::vector<std::string> &arg
-    ) override {
-        return true;
+        this->Spellings = attrib_spellings;
     }
 };
-
-static clang::FrontendPluginRegistry::Add<GBoxPlugin>
-    X("gbox-plugin", "Finds [[gbox::]] attributes");
 
 #endif  // GBOX_MACROS_PLUGINS_HPP_

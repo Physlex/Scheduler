@@ -52,13 +52,13 @@ struct task_if;
 typedef int8_t (*poll_callback_ptr_t)(struct task*);
 
 /** @struct task_if
- *  @typedef task_if_t
+ *  @typedef task_vt_t
  *  @brief Virtual interface for tasks.
  */
 typedef struct task_if {
     gen_callback_ptr_t run;
     poll_callback_ptr_t poll;
-} task_if_t;
+} task_vt_t;
 
 /** @struct task
  *  @brief Simple task definition. Wraps a generic callback pointer and tracks
@@ -67,7 +67,7 @@ typedef struct task_if {
  *  TODO: DOCS
  */
 typedef struct task {
-    task_if_t interface;
+    task_vt_t interface;
     void* args;
     task_state_k state;
 } task_t;
@@ -103,7 +103,7 @@ extern uintptr_t task_size();
  */
 extern const struct task_if task_if(struct task* task);
 
-/** @fn struct task task_create(const task_if_t interface, void *args)
+/** @fn struct task task_create(const task_vt_t interface, void *args)
  *  @brief Simple task creation utility. Takes a set of args and 'hooks' into
  *         scheduler.
  *
@@ -114,7 +114,7 @@ extern const struct task_if task_if(struct task* task);
  *
  *  TODO: DOCS
  */
-static struct task task_create(const task_if_t interface, void* args);
+static struct task task_create(const task_vt_t interface, void* args);
 
 #ifdef __cplusplus
 };

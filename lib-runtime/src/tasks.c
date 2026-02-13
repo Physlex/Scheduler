@@ -16,10 +16,10 @@ static inline int8_t _simple_poll(task_t* ctx) {
 }
 
 struct task simple_task_create(const gen_callback_ptr_t run, void* args) {
-    return task_create((task_if_t){.run = run, .poll = _simple_poll}, args);
+    return task_create((task_vt_t){.run = run, .poll = _simple_poll}, args);
 }
 
-struct task task_create(const task_if_t interface, void* args) {
+struct task task_create(const task_vt_t interface, void* args) {
     task_t task =
         (task_t){.interface = interface, .args = args, .state = TS_WAITING};
 
@@ -48,4 +48,4 @@ int8_t task_poll(task_t* ctx) {
 
 uintptr_t task_size() { return sizeof(struct task); }
 
-const task_if_t task_if(task_t* task) { return task->interface; }
+const task_vt_t task_if(task_t* task) { return task->interface; }
