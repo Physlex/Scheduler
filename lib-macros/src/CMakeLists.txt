@@ -2,7 +2,8 @@
 ## brief: This file links the required C source files and builds a static library.
 
 file(GLOB_RECURSE GBOX_MACROS_CPP_SRC "${GBOX_MACROS_SRC_PATH}/*.cpp")
-add_library(${GBOX_MACROS_NAME} STATIC ${GBOX_MACROS_CPP_SRC})
+
+add_library(${GBOX_MACROS_NAME} SHARED ${GBOX_MACROS_CPP_SRC})
 
 target_include_directories(
   ${GBOX_MACROS_NAME}
