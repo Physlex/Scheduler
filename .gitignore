@@ -4,6 +4,9 @@
 build/
 .vscode/
 
+# Clangd
+.cache/*
+
 # Python build system
 .venv
 .python-version

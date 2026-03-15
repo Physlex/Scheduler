@@ -59,7 +59,7 @@ async int32_t user_main(void* args) {
 
 // In theory, this will eventually be generated boilerplate for the "true"
 // entrypoint
-async int32_t main(int32_t argc, char** argv) {
+int32_t main(int32_t argc, char** argv) {
     uint32_t maximum_num_tasks = 100;
     sched_init(maximum_num_tasks);
 

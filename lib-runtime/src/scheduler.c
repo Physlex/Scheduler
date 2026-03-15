@@ -4,10 +4,6 @@
 
 #include "gbox/runtime/scheduler.h"
 
-#include <stdlib.h>
-#include <string.h>
-
-#include "gbox/runtime/conf/defs.h"
 #include "gbox/runtime/container/ring.h"
 #include "gbox/runtime/tasks.h"
 #include "gbox/runtime/utility/errors.h"

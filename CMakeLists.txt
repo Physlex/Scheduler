@@ -16,7 +16,7 @@ set(PROJECT_EXAMPLE_PATH "${PROJECT_SOURCE_DIR}/examples")
 
 include(${PROJECT_CONF_PATH}/AddTests.cmake)
 include(${PROJECT_CONF_PATH}/AddExamples.cmake)
-include(${PROJECT_CONF_PATH}/AddCustomTargets.cmake)
+include(${PROJECT_CONF_PATH}/TargetFormat.cmake)
 include(${PROJECT_CONF_PATH}/AddTarget.cmake)
 
 if(NOT CMAKE_C_COMPILER MATCHES "clang" OR NOT CMAKE_CXX_COMPILER MATCHES clang\\+\\+)

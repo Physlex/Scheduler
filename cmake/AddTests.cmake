@@ -2,7 +2,7 @@
 #
 # This file converts a set of globbed source files into tests binaries.
 
-function(add_tests)
+function(gbox_add_tests)
     # Parse keyword arguments:
     #   SOURCES   - list of source files
     #   INCLUDES  - list of include dirs
@@ -19,7 +19,7 @@ function(add_tests)
         cmake_path(GET TEST STEM TEST_NAME)
         set(RUNTIME_NAME "test-${TEST_NAME}")
 
-        add_executable(${RUNTIME_NAME} ${TEST})
+        gbox_add_executable(${RUNTIME_NAME} ${TEST})
 
         target_include_directories(
             ${RUNTIME_NAME} PRIVATE ${ADDTEST_INCLUDES}

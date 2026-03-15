@@ -19,7 +19,7 @@ function(add_examples)
         cmake_path(GET EX STEM EX_NAME)
         set(RUNTIME_NAME "ex-${EX_NAME}")
 
-        add_executable(${RUNTIME_NAME} ${EX})
+        gbox_add_executable(${RUNTIME_NAME} ${EX})
 
         target_include_directories(
             ${RUNTIME_NAME} PRIVATE ${ADDEXAMPLES_INCLUDES}

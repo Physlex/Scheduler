@@ -31,9 +31,13 @@
         export Clang_DIR=${pkgs.llvmPackages.libclang.dev}/lib/cmake/clang
         echo "Nix development environment initialized."
         cmake -B build -S . -G Ninja \
-          -DCMAKE_TOOLCHAIN_FILE=cmake/clang-toolchain.cmake \
-          -DCMAKE_EXPORT_COMPILE_COMMANDS=On
-        ln -s ./build/compile_commands.json ./build/
+          -DCMAKE_TOOLCHAIN_FILE=$PWD/cmake/clang-toolchain.cmake \
+          -DCMAKE_EXPORT_COMPILE_COMMANDS=1
+
+        # TODO: Replace this with installing the plugin from a github artifact.
+        #       for now, this makes sure that the plugin is installed on first
+        #       pass.
+        cmake --build build
       '';
     };
   };

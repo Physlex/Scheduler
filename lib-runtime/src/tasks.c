@@ -4,11 +4,7 @@
 
 #include "gbox/runtime/tasks.h"
 
-#include <stdlib.h>
-
-#include "gbox/runtime/conf/defs.h"
 #include "gbox/runtime/utility/errors.h"
-#include "gbox/runtime/utility/sys.h"
 
 static inline int8_t _simple_poll(task_t* ctx) {
     ctx->state = TS_READY;

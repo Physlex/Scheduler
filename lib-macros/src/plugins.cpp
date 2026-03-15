@@ -3,45 +3,100 @@
  *         preprocessing macros.
  */
 
-#include "clang/AST/ASTConsumer.h"
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Frontend/FrontendPluginRegistry.h"
-#include "clang/ASTMatchers/ASTMatchFinder.h"
-#include "clang/ASTMatchers/ASTMatchers.h"
+#include <clang/AST/ASTConsumer.h>
+#include <clang/ASTMatchers/ASTMatchFinder.h>
+#include <clang/ASTMatchers/ASTMatchers.h>
+#include <clang/ASTMatchers/ASTMatchersInternal.h>
+#include <clang/Frontend/CompilerInstance.h>
+#include <clang/Frontend/FrontendPluginRegistry.h>
+#include <clang/Lex/Token.h>
+
+#include <vector>
 
 using namespace clang;
 using namespace clang::attr;
 using namespace clang::ast_matchers;
 using namespace llvm;
 
+std::vector<Token> proc_macro_executor(std::vector<Token> tokens) {
+    llvm::outs() << "invoked executor proc macro!";
+
+    Token tok = Token();
+    std::vector<Token> vec = {tok};
+    return vec;
+}
+
 /**
  *  @brief TODO: DOCS
  */
-class AnnotatedCallbackHandler : public MatchFinder::MatchCallback {
-  public:
+class HandleFuncDecl : public MatchFinder::MatchCallback {
+   public:
     //! @brief TODO: DOCS
-    void run(const MatchFinder::MatchResult &Result) override {
-        const FunctionDecl *FD = Result.Nodes.getNodeAs<FunctionDecl>("funcDecl");
-        if (FD) {
-            if (FD->hasBody()) {
-                llvm::outs() << "Function: " << FD->getNameAsString() << " has attributes:\n";
-                for (auto attr : FD->getAttrs()) {
-                    // Check for specific attribute types, e.g., AnnotateAttr
-                    if (const AnnotateAttr *Annot = dyn_cast<AnnotateAttr>(attr)) {
-                        llvm::outs() << "  Annotate attribute: " << Annot->getAnnotation() << "\n";
-                    } else {
-                        // For general attributes, you can print their kind or spelling
-                        llvm::outs() << "  Attribute kind ID: " << attr->getKind() << "\n";
-                        // Or print a pretty string representation
-                        std::string SS;
-                        llvm::raw_string_ostream S(SS);
-                        PrintingPolicy Policy(FD->getLangOpts());
-                        attr->printPretty(S, Policy);
-                        llvm::outs() << "  Attribute string: " << S.str() << "\n";
-                    }
-                }
+    void run(const MatchFinder::MatchResult& res) override {
+        const FunctionDecl* func_decl =
+            res.Nodes.getNodeAs<FunctionDecl>("funcDecl");
+        if (!func_decl) {
+            return;
+        }
+
+        const FunctionDecl* fdef = func_decl->getDefinition();
+        if (!fdef) {
+            return;
+        }
+
+        std::vector<StringRef> annotations;
+
+        for (auto attr : fdef->getAttrs()) {
+            const AnnotateAttr* annotated_attr = dyn_cast<AnnotateAttr>(attr);
+            if (annotated_attr) {
+                annotations.push_back(annotated_attr->getAnnotation());
             }
         }
+
+        // Skip functions that have no annotations
+        if (annotations.size() == 0) {
+            return;
+        }
+
+        ASTContext* ctx = res.Context;
+        SourceManager& sm = ctx->getSourceManager();
+
+        SourceRange src_range = fdef->getSourceRange();
+        SourceLocation src_begin = src_range.getBegin();
+        SourceLocation src_end = src_range.getEnd();
+
+        unsigned start = sm.getFileOffset(src_begin);
+        unsigned end = sm.getFileOffset(src_end);
+
+        FileID file = sm.getFileID(src_begin);
+        StringRef buffer = sm.getBufferData(file);
+        StringRef func_src_text = buffer.substr(start, end - start + 1);
+
+        MemoryBufferRef func_src_buff = MemoryBufferRef(
+            func_src_text, "<proc_macro_attribute function slice>");
+
+        std::vector<Token> token_stream;
+
+        Lexer lexer =
+            Lexer(file, func_src_buff, sm, res.Context->getLangOpts());
+        Token tok;
+        while (!lexer.LexFromRawLexer(tok)) {
+            StringRef text = StringRef(func_src_buff.getBufferStart() +
+                                           tok.getLocation().getRawEncoding(),
+                                       tok.getLength());
+
+            llvm::outs() << "Token: " << text << " Kind: " << tok.getName()
+                         << "\n";
+            token_stream.push_back(tok);
+        }
+
+        for (auto annotation : annotations) {
+            if (annotation == "executor") {
+                proc_macro_executor(token_stream);
+            }
+        }
+
+        llvm::outs() << func_src_text << "\n";
     }
 };
 
@@ -49,44 +104,36 @@ class AnnotatedCallbackHandler : public MatchFinder::MatchCallback {
  *  @brief TODO: DOCS
  */
 class ProcMacroConsumer : public ASTConsumer {
-  public:
+   public:
     ProcMacroConsumer(std::string FileName) : FileName(std::move(FileName)) {}
 
-    void HandleTranslationUnit(ASTContext &Context) override {
-        AnnotatedCallbackHandler Handler;
-        MatchFinder Finder;
+    void HandleTranslationUnit(ASTContext& ctx) override {
+        HandleFuncDecl handler;
+        MatchFinder finder;
 
-        // Match any function declaration
-        Finder.addMatcher(
-            functionDecl().bind("funcDecl"),
-            &Handler
-        );
-
-        Finder.matchAST(Context);
+        // Match against function definitions
+        finder.addMatcher(functionDecl().bind("funcDecl"), &handler);
+        finder.matchAST(ctx);
     }
 
-  private:
-    std::string FileName;  
+   private:
+    std::string FileName;
 };
 
 class ProcMacroPlugin : public PluginASTAction {
-  protected:
+   protected:
     std::unique_ptr<ASTConsumer> CreateASTConsumer(
-        CompilerInstance &CI, llvm::StringRef InFile
-    ) override {
+        CompilerInstance& CI, llvm::StringRef InFile) override {
         return std::make_unique<ProcMacroConsumer>(InFile.str());
     }
 
-    bool ParseArgs(
-        const CompilerInstance &CI, const std::vector<std::string> &Args
-    ) override {
+    bool ParseArgs(const CompilerInstance& CI,
+                   const std::vector<std::string>& Args) override {
         return true;
     }
 
-    ActionType getActionType() override {
-        return AddAfterMainAction;
-    }
+    ActionType getActionType() override { return AddAfterMainAction; }
 };
 
-static FrontendPluginRegistry::Add<ProcMacroPlugin>
-    X("gbox-macros-plugin", "Procedural macro scheme for C/C++");
+static FrontendPluginRegistry::Add<ProcMacroPlugin> X(
+    "gbox-macros-plugin", "Procedural macro scheme for C/C++");
