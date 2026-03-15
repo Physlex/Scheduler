@@ -64,8 +64,7 @@ int32_t main(int32_t argc, char** argv) {
     sched_init(maximum_num_tasks);
 
     struct user_main_task_args user_main_args = {.argc = argc, .argv = argv};
-    task_t user_main_task =
-        simple_task_create(user_main, (void*)&user_main_args);
+    task_t user_main_task = simple_task_create(user_main, (void*)&user_main_args);
     sched_task(&user_main_task);
 
     // Ideally, we should be able to yield tasks early and return their result,

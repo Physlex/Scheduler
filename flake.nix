@@ -13,9 +13,9 @@
     devShells.${system}.default = pkgs.mkShell {
       buildInputs = with pkgs; [
         llvmPackages_latest.llvm
-        llvmPackages_latest.clang
         llvmPackages_latest.libclang.dev
         llvmPackages_latest.libclang.lib
+        llvmPackages_latest.clang
         llvmPackages_latest.llvm.dev
         gdb
         gtest
@@ -27,13 +27,12 @@
       ];
 
       shellHook = ''
-        export LLVM_DIR=${pkgs.llvmPackages.llvm.dev}/lib/cmake/llvm
-        export Clang_DIR=${pkgs.llvmPackages.libclang.dev}/lib/cmake/clang
+        export LLVM_DIR=${pkgs.llvmPackages_latest.llvm.dev}/lib/cmake/llvm
+        export Clang_DIR=${pkgs.llvmPackages_latest.libclang.dev}/lib/cmake/clang
+
         echo "Nix development environment initialized."
-        cmake -B build -S . -G Ninja \
-          -DCMAKE_TOOLCHAIN_FILE=$PWD/cmake/clang-toolchain.cmake \
-          -DCMAKE_EXPORT_COMPILE_COMMANDS=1
-c
+        ./tools/setup.sh
+
         # TODO: Replace this with installing the plugin from a github artifact.
         #       for now, this makes sure that the plugin is installed on first
         #       pass.

@@ -16,8 +16,7 @@ struct task simple_task_create(const gen_callback_ptr_t run, void* args) {
 }
 
 struct task task_create(const task_vt_t interface, void* args) {
-    task_t task =
-        (task_t){.interface = interface, .args = args, .state = TS_WAITING};
+    task_t task = (task_t){.interface = interface, .args = args, .state = TS_WAITING};
 
     return task;
 }

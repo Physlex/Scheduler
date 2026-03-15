@@ -33,8 +33,7 @@ class HandleFuncDecl : public MatchFinder::MatchCallback {
    public:
     //! @brief TODO: DOCS
     void run(const MatchFinder::MatchResult& res) override {
-        const FunctionDecl* func_decl =
-            res.Nodes.getNodeAs<FunctionDecl>("funcDecl");
+        const FunctionDecl* func_decl = res.Nodes.getNodeAs<FunctionDecl>("funcDecl");
         if (!func_decl) {
             return;
         }
@@ -72,21 +71,26 @@ class HandleFuncDecl : public MatchFinder::MatchCallback {
         StringRef buffer = sm.getBufferData(file);
         StringRef func_src_text = buffer.substr(start, end - start + 1);
 
-        MemoryBufferRef func_src_buff = MemoryBufferRef(
-            func_src_text, "<proc_macro_attribute function slice>");
+        MemoryBufferRef func_src_buff =
+            MemoryBufferRef(func_src_text, "<proc_macro_attribute function slice>");
 
         std::vector<Token> token_stream;
 
-        Lexer lexer =
-            Lexer(file, func_src_buff, sm, res.Context->getLangOpts());
+        Lexer lexer = Lexer(file, func_src_buff, sm, res.Context->getLangOpts());
         Token tok;
         while (!lexer.LexFromRawLexer(tok)) {
-            StringRef text = StringRef(func_src_buff.getBufferStart() +
-                                           tok.getLocation().getRawEncoding(),
-                                       tok.getLength());
+            llvm::outs() << "Function Source Buffer Start: "
+                         << func_src_buff.getBufferStart() << "Token: [LOC, LEN]" << "["
+                         << tok.getLocation().getRawEncoding() << tok.getLength() << "]";
 
-            llvm::outs() << "Token: " << text << " Kind: " << tok.getName()
-                         << "\n";
+            StringRef text = StringRef(
+                func_src_buff.getBufferStart() + tok.getLocation().getRawEncoding(),
+                tok.getLength());
+
+            llvm::outs() << "Token: " << text << " Kind: " << tok.getName() << "\n";
+
+            return;  // TODO: REMOVE
+
             token_stream.push_back(tok);
         }
 
@@ -122,8 +126,8 @@ class ProcMacroConsumer : public ASTConsumer {
 
 class ProcMacroPlugin : public PluginASTAction {
    protected:
-    std::unique_ptr<ASTConsumer> CreateASTConsumer(
-        CompilerInstance& CI, llvm::StringRef InFile) override {
+    std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance& CI,
+                                                   llvm::StringRef InFile) override {
         return std::make_unique<ProcMacroConsumer>(InFile.str());
     }
 

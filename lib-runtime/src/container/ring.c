@@ -108,9 +108,7 @@ bool ring_is_full(const ring_t* ctx) {
     return ctx->read_ptr == ((ctx->write_ptr + ctx->size) % ctx->capacity);
 }
 
-bool ring_is_empty(const ring_t* ctx) {
-    return ctx->read_ptr == ctx->write_ptr;
-}
+bool ring_is_empty(const ring_t* ctx) { return ctx->read_ptr == ctx->write_ptr; }
 
 uintptr_t ring_capacity(const ring_t* ctx) {
     // Ignore the sentinel value...

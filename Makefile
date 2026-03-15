@@ -8,3 +8,5 @@ format:
 
 clean:
 	rm -rf build/
+
+.PHONY: build format clean

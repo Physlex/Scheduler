@@ -16,8 +16,7 @@ using namespace clang;
 using namespace clang::tooling;
 using namespace llvm;
 
-class FindMyAttributeVisitor
-    : public RecursiveASTVisitor<FindMyAttributeVisitor> {
+class FindMyAttributeVisitor : public RecursiveASTVisitor<FindMyAttributeVisitor> {
    public:
     FindMyAttributeVisitor(ASTContext& ctx) : ctx(ctx) {}
 
@@ -41,8 +40,8 @@ class FindMyAttributeConsumer : public ASTConsumer {
 
 class FindMyAttributeAction : public ASTFrontendAction {
    public:
-    virtual std::unique_ptr<ASTConsumer> CreateASTConsumer(
-        CompilerInstance& Compiler, StringRef InFile) {
+    virtual std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance& Compiler,
+                                                           StringRef InFile) {
         return std::make_unique<FindMyAttributeConsumer>();
     }
 };
