@@ -10,7 +10,7 @@
  * TODO: DOCS
  */
 class TokenStream {
-  public:
+   public:
     TokenStream() = default;
 };
 
@@ -18,18 +18,18 @@ class TokenStream {
  * TODO: DOCS
  */
 enum LitKind {
-    
+
 };
 
 /**
  * TODO: DOCS
  */
 class Span {
-  public:
+   public:
     Span() = default;
     Span(uint32_t start, uint32_t end) : start_(start), end_(end) {};
 
-  private:
+   private:
     uint32_t start_;
     uint32_t end_;
 };
@@ -38,10 +38,10 @@ class Span {
  * TODO: DOCS
  */
 class Literal {
-  public:
+   public:
     Literal() = default;
 
-  private:
+   private:
     const char *txt;
     LitKind kind;
     Span span;
@@ -51,10 +51,10 @@ class Literal {
  * TODO: DOCS
  */
 class Ident {
-  public:
+   public:
     Ident() = default;
 
-  private:
+   private:
     const char *txt;
     bool is_raw;
     Span span;

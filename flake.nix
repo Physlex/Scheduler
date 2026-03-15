@@ -29,7 +29,7 @@
       shellHook = ''
         export LLVM_DIR=${pkgs.llvmPackages_latest.llvm.dev}/lib/cmake/llvm
         export Clang_DIR=${pkgs.llvmPackages_latest.libclang.dev}/lib/cmake/clang
-
+        export LD_LIBRARY_PATH=${pkgs.stdenv.cc.cc.lib}/lib/
         echo "Nix development environment initialized."
         ./tools/setup.sh
 

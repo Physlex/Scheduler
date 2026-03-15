@@ -14,7 +14,7 @@
  */
 
 int32_t hello_world(
-    void* args
+    void *args
 ) {
     printf("Hello, World!\n");
     return 0;

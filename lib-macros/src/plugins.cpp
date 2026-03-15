@@ -19,15 +19,15 @@ std::vector<clang::Token> proc_macro_executor(
 }
 
 void HandleFuncDecl::run(
-    const clang::ast_matchers::MatchFinder::MatchResult& res
+    const clang::ast_matchers::MatchFinder::MatchResult &res
 ) {
-    const clang::FunctionDecl* func_decl =
+    const clang::FunctionDecl *func_decl =
         res.Nodes.getNodeAs<clang::FunctionDecl>("funcDecl");
     if (!func_decl) {
         return;
     }
 
-    const clang::FunctionDecl* fdef = func_decl->getDefinition();
+    const clang::FunctionDecl *fdef = func_decl->getDefinition();
     if (!fdef) {
         return;
     }
@@ -35,7 +35,7 @@ void HandleFuncDecl::run(
     std::vector<llvm::StringRef> annotations;
 
     for (auto attr : fdef->getAttrs()) {
-        const auto* annotated_attr = dyn_cast<clang::AnnotateAttr>(attr);
+        const auto *annotated_attr = dyn_cast<clang::AnnotateAttr>(attr);
         if (annotated_attr) {
             annotations.push_back(annotated_attr->getAnnotation());
         }
@@ -46,8 +46,8 @@ void HandleFuncDecl::run(
         return;
     }
 
-    clang::ASTContext* ctx = res.Context;
-    clang::SourceManager& sm = ctx->getSourceManager();
+    clang::ASTContext *ctx = res.Context;
+    clang::SourceManager &sm = ctx->getSourceManager();
 
     clang::SourceRange src_range = fdef->getSourceRange();
     clang::SourceLocation src_begin = src_range.getBegin();
@@ -71,7 +71,7 @@ void HandleFuncDecl::run(
     while (!lexer.LexFromRawLexer(tok)) {
         const uint32_t tok_start = sm.getFileOffset(tok.getLocation());
         const uint32_t tok_length = tok.getLength();
-        const char* text_start = func_src_buff.getBufferStart();
+        const char *text_start = func_src_buff.getBufferStart();
 
         llvm::StringRef slice = llvm::StringRef(text_start + tok_start, tok_length);
         llvm::outs() << "clang::Token: " << slice << " Kind: " << tok.getName() << "\n";
@@ -87,7 +87,7 @@ void HandleFuncDecl::run(
 }
 
 void ProcMacroConsumer::HandleTranslationUnit(
-    clang::ASTContext& ctx
+    clang::ASTContext &ctx
 ) {
     HandleFuncDecl handler;
     clang::ast_matchers::MatchFinder finder;

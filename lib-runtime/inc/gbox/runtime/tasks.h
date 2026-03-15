@@ -49,7 +49,7 @@ struct task_if;
 /** @typedef poll_callback_ptr_t
  *  @brief TODO: DOCS
  */
-typedef int8_t (*poll_callback_ptr_t)(struct task*);
+typedef int8_t (*poll_callback_ptr_t)(struct task *);
 
 /** @struct task_if
  *  @typedef task_vt_t
@@ -68,7 +68,7 @@ typedef struct task_if {
  */
 typedef struct task {
     task_vt_t interface;
-    void* args;
+    void *args;
     task_state_k state;
 } task_t;
 
@@ -80,18 +80,18 @@ typedef struct task task_t;
 /** @fn struct task simple_task_create(gen_callback_ptr_t, void *)
  *  @brief TODO: DOCS
  */
-extern struct task simple_task_create(gen_callback_ptr_t run, void* args);
+extern struct task simple_task_create(gen_callback_ptr_t run, void *args);
 
 /** @fn int32_t task_run(struct task *)
  *  @brief Runs the simple task, then marks the task as completed.
  */
-extern int32_t task_run(struct task* ctx);
+extern int32_t task_run(struct task *ctx);
 
 /** @fn task_poll
  *  @brief Polls a task to query if it is ready.
  *  @return positive task_state_k. On error, negative error code.
  */
-extern int8_t task_poll(struct task* task);
+extern int8_t task_poll(struct task *task);
 
 /** @fn uinptr_t task_size()
  *  @brief Extractor for number of bytes in a simple task struct.
@@ -101,7 +101,7 @@ extern uintptr_t task_size();
 /** @fn task_if(struct task_if *)
  *  @brief Extractor for task interface.
  */
-extern const struct task_if task_if(struct task* task);
+extern const struct task_if task_if(struct task *task);
 
 /** @fn struct task task_create(const task_vt_t interface, void *args)
  *  @brief Simple task creation utility. Takes a set of args and 'hooks' into
@@ -114,7 +114,7 @@ extern const struct task_if task_if(struct task* task);
  *
  *  TODO: DOCS
  */
-static struct task task_create(const task_vt_t interface, void* args);
+static struct task task_create(const task_vt_t interface, void *args);
 
 #ifdef __cplusplus
 };

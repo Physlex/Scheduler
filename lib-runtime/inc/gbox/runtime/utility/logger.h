@@ -60,7 +60,7 @@ extern int8_t logger_set_fdout(int32_t fd);
  *  @param level The level of logging.
  *  @return A negative error code or 0.
  */
-extern int8_t logger_vlog(log_level_k level, const char* format, ...);
+extern int8_t logger_vlog(log_level_k level, const char *format, ...);
 
 //! @brief Logging utility. Log as a debug level.
 #define LOG_DEBUG (format, vargs) logger_vlog(LL_DEBUG, format, vargs);

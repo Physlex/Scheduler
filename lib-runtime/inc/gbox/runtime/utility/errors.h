@@ -79,7 +79,7 @@ inline void error_panic(
  *  @param code The error code that needs decoding.
  *  @return A message corresponding to the error code.
  */
-extern const char* code_into_error_msg(error_code_k code);
+extern const char *code_into_error_msg(error_code_k code);
 
 #ifdef __cplusplus
 }

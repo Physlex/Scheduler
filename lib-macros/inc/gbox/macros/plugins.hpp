@@ -6,34 +6,28 @@
  */
 
 #include <clang/AST/ASTConsumer.h>
-#include <clang/AST/Decl.h>
 #include <clang/ASTMatchers/ASTMatchFinder.h>
 #include <clang/ASTMatchers/ASTMatchers.h>
-#include <clang/ASTMatchers/ASTMatchersInternal.h>
-#include <clang/Basic/IdentifierTable.h>
 #include <clang/Frontend/CompilerInstance.h>
 #include <clang/Frontend/FrontendPluginRegistry.h>
-#include <clang/Lex/Token.h>
 
 #include <memory>
 #include <vector>
 
-/**
- *  @brief TODO: DOCS
- */
+/// Boilerplate to handle clang
 class HandleFuncDecl : public clang::ast_matchers::MatchFinder::MatchCallback {
    public:
-    //! @brief TODO: DOCS
-    void run(const clang::ast_matchers::MatchFinder::MatchResult& res) override;
+    //! @brief Ru
+    void run(const clang::ast_matchers::MatchFinder::MatchResult &res) override;
 };
 
 /**
- *  @brief TODO: DOCS
+ *  @brief This method implements the "frontend" logic for parsing each t-unit
  */
 class ProcMacroConsumer : public clang::ASTConsumer {
    public:
     /// Override to handle each translation unit according to the consumer.
-    void HandleTranslationUnit(clang::ASTContext& ctx) override;
+    void HandleTranslationUnit(clang::ASTContext &ctx) override;
 };
 
 /// This class really just exists as the hook-up boilerplate for the sake of the clang
@@ -41,15 +35,15 @@ class ProcMacroConsumer : public clang::ASTConsumer {
 class ProcMacroPlugin : public clang::PluginASTAction {
    protected:
     inline std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(
-        clang::CompilerInstance& _ci,
+        clang::CompilerInstance &_ci,
         llvm::StringRef _in_file
     ) override {
         return std::make_unique<ProcMacroConsumer>();
     }
 
     inline bool ParseArgs(
-        const clang::CompilerInstance& ci,
-        const std::vector<std::string>& args
+        const clang::CompilerInstance &_ci,
+        const std::vector<std::string> &_args
     ) override {
         return true;
     }
