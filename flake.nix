@@ -33,7 +33,7 @@
         cmake -B build -S . -G Ninja \
           -DCMAKE_TOOLCHAIN_FILE=$PWD/cmake/clang-toolchain.cmake \
           -DCMAKE_EXPORT_COMPILE_COMMANDS=1
-
+c
         # TODO: Replace this with installing the plugin from a github artifact.
         #       for now, this makes sure that the plugin is installed on first
         #       pass.

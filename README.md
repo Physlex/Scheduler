@@ -16,6 +16,8 @@ For justification, see: `docs/justification.md`
 
 ### Requirements
 
+TODO: Docs on NIX and DIRENV
+
 Currently, the project assumes you are building it using Linux or WSL2.
 
 run:

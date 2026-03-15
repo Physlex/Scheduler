@@ -1,5 +1,2 @@
 CompileFlags:
-  CompilationDatabase:
-
-buildCompileFlags:
-  Add: [-fplugin=build/lib/libgbox-macros.so]
+  CompilationDatabase: build

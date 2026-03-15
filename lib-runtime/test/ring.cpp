@@ -6,8 +6,6 @@
 
 #include <gtest/gtest.h>
 
-#include "gbox/runtime/utility/errors.h"
-
 TEST(ringCreate, ringTests) {
     const uint32_t ring_size = sizeof(float32_t);
     const uint32_t ring_len = 4;
