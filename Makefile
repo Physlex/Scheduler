@@ -9,4 +9,7 @@ format:
 clean:
 	rm -rf build/
 
+clean-examples:
+	rm -rf build/examples
+
 .PHONY: build format clean

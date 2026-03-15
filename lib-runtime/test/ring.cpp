@@ -6,7 +6,10 @@
 
 #include <gtest/gtest.h>
 
-TEST(ringCreate, ringTests) {
+TEST(
+    ringCreate,
+    ringTests
+) {
     const uint32_t ring_size = sizeof(float32_t);
     const uint32_t ring_len = 4;
 
@@ -17,14 +20,20 @@ TEST(ringCreate, ringTests) {
     ASSERT_EQ(nullptr, ring);
 }
 
-TEST(ringDestroyNull, ringTests) {
+TEST(
+    ringDestroyNull,
+    ringTests
+) {
     const uint32_t ring_size = sizeof(float32_t);
     const uint32_t ring_len = 4;
 
     ASSERT_NE(0, ring_destroy(nullptr));
 }
 
-TEST(ringQueue, ringTests) {
+TEST(
+    ringQueue,
+    ringTests
+) {
     const uint32_t ring_size = sizeof(float32_t);
     const uint32_t ring_len = 4;
     const uint32_t datum = 1;
@@ -36,7 +45,10 @@ TEST(ringQueue, ringTests) {
     ASSERT_EQ(0, ring_destroy(&ring));
 }
 
-TEST(ringQueueDequeueUint32, ringTests) {
+TEST(
+    ringQueueDequeueUint32,
+    ringTests
+) {
     const uint32_t ring_size = sizeof(int32_t);
     const uint32_t ring_len = 2;
 
@@ -53,7 +65,10 @@ TEST(ringQueueDequeueUint32, ringTests) {
     ASSERT_EQ(0, ring_destroy(&ring));
 }
 
-TEST(ringQueueDequeue, ringTests) {
+TEST(
+    ringQueueDequeue,
+    ringTests
+) {
     const uint32_t ring_size = sizeof(float32_t);
     const uint32_t ring_len = 4;
     ring_t* ring = ring_new(ring_size, ring_len);
@@ -72,7 +87,10 @@ TEST(ringQueueDequeue, ringTests) {
     ASSERT_EQ(nullptr, ring);
 }
 
-TEST(ringOverrun, ringTests) {
+TEST(
+    ringOverrun,
+    ringTests
+) {
     const uint32_t ring_size = sizeof(uint32_t);
     const uint32_t ring_len = 2;
     ring_t* ring = ring_new(ring_size, ring_len);
@@ -93,7 +111,10 @@ TEST(ringOverrun, ringTests) {
     ASSERT_EQ(0, ring_destroy(&ring));
 }
 
-TEST(ringOverrunP1, ringTests) {
+TEST(
+    ringOverrunP1,
+    ringTests
+) {
     const uint32_t ring_size = sizeof(uint32_t);
     const uint32_t ring_len = 2;
     ring_t* ring = ring_new(ring_size, ring_len);

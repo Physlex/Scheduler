@@ -13,14 +13,19 @@
  *  @{
  */
 
-int32_t hello_world(void* args) {
+int32_t hello_world(
+    void* args
+) {
     printf("Hello, World!\n");
     return 0;
 }
 
 /** @} */
 
-TEST(simpleTaskCall, simpleTaskTests) {
+TEST(
+    simpleTaskCall,
+    simpleTaskTests
+) {
     task_t stask = simple_task_create(hello_world, nullptr);
 
     ASSERT_EQ(TS_READY, task_poll(&stask));

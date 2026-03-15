@@ -6,56 +6,55 @@
  */
 
 #include <clang/AST/ASTConsumer.h>
-#include <clang/AST/ASTContext.h>
-#include <clang/AST/Attr.h>
-#include <clang/AST/RecursiveASTVisitor.h>
-#include <clang/Frontend/FrontendAction.h>
+#include <clang/AST/Decl.h>
+#include <clang/ASTMatchers/ASTMatchFinder.h>
+#include <clang/ASTMatchers/ASTMatchers.h>
+#include <clang/ASTMatchers/ASTMatchersInternal.h>
+#include <clang/Basic/IdentifierTable.h>
+#include <clang/Frontend/CompilerInstance.h>
 #include <clang/Frontend/FrontendPluginRegistry.h>
+#include <clang/Lex/Token.h>
 
-using namespace clang;
-using namespace clang::tooling;
-using namespace llvm;
+#include <memory>
+#include <vector>
 
-class FindMyAttributeVisitor : public RecursiveASTVisitor<FindMyAttributeVisitor> {
+/**
+ *  @brief TODO: DOCS
+ */
+class HandleFuncDecl : public clang::ast_matchers::MatchFinder::MatchCallback {
    public:
-    FindMyAttributeVisitor(ASTContext& ctx) : ctx(ctx) {}
+    //! @brief TODO: DOCS
+    void run(const clang::ast_matchers::MatchFinder::MatchResult& res) override;
+};
 
-    // Visit an attribute.
-    bool VisitAttr(Attr* attr) {
-        attr->printPretty(llvm::outs(), ctx.getPrintingPolicy());
+/**
+ *  @brief TODO: DOCS
+ */
+class ProcMacroConsumer : public clang::ASTConsumer {
+   public:
+    /// Override to handle each translation unit according to the consumer.
+    void HandleTranslationUnit(clang::ASTContext& ctx) override;
+};
+
+/// This class really just exists as the hook-up boilerplate for the sake of the clang
+/// compilation process.
+class ProcMacroPlugin : public clang::PluginASTAction {
+   protected:
+    inline std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(
+        clang::CompilerInstance& _ci,
+        llvm::StringRef _in_file
+    ) override {
+        return std::make_unique<ProcMacroConsumer>();
+    }
+
+    inline bool ParseArgs(
+        const clang::CompilerInstance& ci,
+        const std::vector<std::string>& args
+    ) override {
         return true;
     }
 
-   private:
-    ASTContext& ctx;
-};
-
-class FindMyAttributeConsumer : public ASTConsumer {
-   public:
-    virtual void HandleTranslationUnit(ASTContext& ctx) {
-        FindMyAttributeVisitor visitor(ctx);
-        visitor.TraverseDecl(ctx.getTranslationUnitDecl());
-    }
-};
-
-class FindMyAttributeAction : public ASTFrontendAction {
-   public:
-    virtual std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance& Compiler,
-                                                           StringRef InFile) {
-        return std::make_unique<FindMyAttributeConsumer>();
-    }
-};
-
-struct ExampleAttributeInfo : public ParsedAttrInfo {
-    ExampleAttributeInfo() {
-        static constexpr Spelling attrib_spellings[3] = {
-            {ParsedAttr::AS_CXX11, "runtime"},
-            {ParsedAttr::AS_C23, "gbox::runtime"},
-            {ParsedAttr::AS_GNU, "runtime"},
-        };
-
-        this->Spellings = attrib_spellings;
-    }
+    ActionType getActionType() override { return AddAfterMainAction; }
 };
 
 #endif  // GBOX_MACROS_PLUGINS_HPP_

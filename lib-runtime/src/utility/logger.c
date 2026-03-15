@@ -20,7 +20,9 @@ typedef struct logger {
 //! @brief Memory allocation for logging.
 static logger_t log;
 
-int8_t logger_set_level(log_level_k level) {
+int8_t logger_set_level(
+    log_level_k level
+) {
     if (level < LL_DEBUG || level > LL_CRITICAL) {
         return -EC_MISUSE;
     }
@@ -30,12 +32,18 @@ int8_t logger_set_level(log_level_k level) {
     return EC_SUCCESS;
 }
 
-int8_t logger_set_fdout(int32_t fd) {
+int8_t logger_set_fdout(
+    int32_t fd
+) {
     // TODO: IMPLEMENTATION
     return EC_SUCCESS;
 }
 
-int8_t logger_vlog(log_level_k level, const char* format, ...) {
+int8_t logger_vlog(
+    log_level_k level,
+    const char* format,
+    ...
+) {
     if (log.level < level) {
     }
 
