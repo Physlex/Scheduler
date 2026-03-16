@@ -7,14 +7,15 @@
 
 #include <clang/AST/ASTContext.h>
 #include <clang/ASTMatchers/ASTMatchFinder.h>
+#include <clang/Basic/TokenKinds.h>
+#include <clang/Lex/Token.h>
+#include <llvm/ADT/StringRef.h>
 
 #include <vector>
 
-#include "clang/Basic/TokenKinds.h"
-#include "clang/Lex/Token.h"
-#include "gbox/macros/proc_macro.hpp"
-#include "gbox/macros/proc_macro/tokens.hpp"
-#include "llvm/ADT/StringRef.h"
+#include "gbox/macros/tokens.hpp"
+
+using namespace gbox;
 
 // TODO: Demonstrate full s2s translation in-memory using the system described prior.
 TokenStream proc_macro_executor(TokenStream input) {
@@ -23,24 +24,22 @@ TokenStream proc_macro_executor(TokenStream input) {
 }
 
 // Mini-recursive descent parser implementation
-namespace gbox {
 namespace parse {
 
-void literals(TokenStream &stream, clang::Token tok, llvm::StringRef slice, Span span) {
-    // TODO: Make some of these non-string types (crazy, right?)
-    auto literal = Literal(slice.data(), span, Literal::Kind::String);
-    stream.push_back(literal);
-}
-
-void identifiers(
+static void literals(
     TokenStream &stream, clang::Token tok, llvm::StringRef slice, Span span
 ) {
-    auto ident = Ident(slice.data(), span, tok.is(clang::tok::raw_identifier));
-    stream.push_back(ident);
+    // TODO: Make some of these non-string types (crazy, right?)
+    stream.emplace_back(Literal(slice.data(), span, Literal::Kind::String));
+}
+
+static void identifiers(
+    TokenStream &stream, clang::Token tok, llvm::StringRef slice, Span span
+) {
+    stream.emplace_back(Ident(slice.data(), span, tok.is(clang::tok::raw_identifier)));
 }
 
 }  // namespace parse
-}  // namespace gbox
 
 void HandleFuncDecl::run(const clang::ast_matchers::MatchFinder::MatchResult &res) {
     const clang::FunctionDecl *func_decl =
@@ -102,9 +101,9 @@ void HandleFuncDecl::run(const clang::ast_matchers::MatchFinder::MatchResult &re
         const auto span = Span(tok_start, tok_length);
         const auto slice = llvm::StringRef(text_start + span.start(), span.length());
         if (tok.isAnyIdentifier()) {
-            gbox::parse::identifiers(stream, tok, slice, span);
+            parse::identifiers(stream, tok, slice, span);
         } else if (tok.isLiteral()) {
-            gbox::parse::literals(stream, tok, slice, span);
+            parse::literals(stream, tok, slice, span);
         }
     }
 

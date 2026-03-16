@@ -15,5 +15,5 @@ TEST(PluginsTestSuite, TestSimple) {
         "int main() { return 0; }"
         "";
 
-    clang::tooling::runToolOnCode(std::make_unique<ProcMacroPlugin>(), code);
+    clang::tooling::runToolOnCode(std::make_unique<gbox::ProcMacroPlugin>(), code);
 }

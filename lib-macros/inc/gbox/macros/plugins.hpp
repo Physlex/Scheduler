@@ -14,6 +14,8 @@
 #include <memory>
 #include <vector>
 
+namespace gbox {
+
 /// Boilerplate to handle clang
 class HandleFuncDecl : public clang::ast_matchers::MatchFinder::MatchCallback {
   public:
@@ -48,5 +50,7 @@ class ProcMacroPlugin : public clang::PluginASTAction {
 
     ActionType getActionType() override { return AddAfterMainAction; }
 };
+
+}  // namespace gbox
 
 #endif  // GBOX_MACROS_PLUGINS_HPP_
