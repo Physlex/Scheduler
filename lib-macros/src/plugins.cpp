@@ -8,15 +8,49 @@
 #include <clang/AST/ASTContext.h>
 #include <clang/ASTMatchers/ASTMatchFinder.h>
 
-std::vector<clang::Token> proc_macro_executor(
-    std::vector<clang::Token> tokens
+#include <vector>
+
+#include "clang/Basic/TokenKinds.h"
+#include "clang/Lex/Token.h"
+#include "gbox/macros/proc_macro.hpp"
+#include "gbox/macros/proc_macro/tokens.hpp"
+#include "llvm/ADT/StringRef.h"
+
+// TODO: Demonstrate full s2s translation in-memory using the system described prior.
+TokenStream proc_macro_executor(
+    TokenStream input
 ) {
     llvm::outs() << "invoked executor proc macro!";
-
-    clang::Token tok = clang::Token();
-    std::vector<clang::Token> vec = {tok};
-    return vec;
+    return input;
 }
+
+// Mini-recursive descent parser implementation
+namespace gbox {
+namespace parse {
+
+void literals(
+    TokenStream &stream,
+    clang::Token tok,
+    llvm::StringRef slice,
+    Span span
+) {
+    // TODO: Make some of these non-string types (crazy, right?)
+    auto literal = Literal(slice.data(), span, Literal::Kind::String);
+    stream.push_back(literal);
+}
+
+void identifiers(
+    TokenStream &stream,
+    clang::Token tok,
+    llvm::StringRef slice,
+    Span span
+) {
+    auto ident = Ident(slice.data(), span, tok.is(clang::tok::raw_identifier));
+    stream.push_back(ident);
+}
+
+}  // namespace parse
+}  // namespace gbox
 
 void HandleFuncDecl::run(
     const clang::ast_matchers::MatchFinder::MatchResult &res
@@ -63,25 +97,32 @@ void HandleFuncDecl::run(
     llvm::MemoryBufferRef func_src_buff =
         llvm::MemoryBufferRef(func_src_text, "<proc_macro_attribute function slice>");
 
-    std::vector<clang::Token> token_stream;
+    // Construct our token stream from the clang tokenstream
+
+    TokenStream stream;
+
     clang::Lexer lexer =
         clang::Lexer(file, func_src_buff, sm, res.Context->getLangOpts());
 
+    // Collect a set of all tokens in one pass
     clang::Token tok;
     while (!lexer.LexFromRawLexer(tok)) {
         const uint32_t tok_start = sm.getFileOffset(tok.getLocation());
         const uint32_t tok_length = tok.getLength();
         const char *text_start = func_src_buff.getBufferStart();
 
-        llvm::StringRef slice = llvm::StringRef(text_start + tok_start, tok_length);
-        llvm::outs() << "clang::Token: " << slice << " Kind: " << tok.getName() << "\n";
-
-        token_stream.push_back(tok);
+        const auto span = Span(tok_start, tok_length);
+        const auto slice = llvm::StringRef(text_start + span.start(), span.length());
+        if (tok.isAnyIdentifier()) {
+            gbox::parse::identifiers(stream, tok, slice, span);
+        } else if (tok.isLiteral()) {
+            gbox::parse::literals(stream, tok, slice, span);
+        }
     }
 
     for (auto annotation : annotations) {
         if (annotation == "executor") {
-            proc_macro_executor(token_stream);
+            proc_macro_executor(std::move(stream));
         }
     }
 }

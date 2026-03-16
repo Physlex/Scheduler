@@ -16,7 +16,7 @@
 
 /// Boilerplate to handle clang
 class HandleFuncDecl : public clang::ast_matchers::MatchFinder::MatchCallback {
-   public:
+  public:
     //! @brief Ru
     void run(const clang::ast_matchers::MatchFinder::MatchResult &res) override;
 };
@@ -25,7 +25,7 @@ class HandleFuncDecl : public clang::ast_matchers::MatchFinder::MatchCallback {
  *  @brief This method implements the "frontend" logic for parsing each t-unit
  */
 class ProcMacroConsumer : public clang::ASTConsumer {
-   public:
+  public:
     /// Override to handle each translation unit according to the consumer.
     void HandleTranslationUnit(clang::ASTContext &ctx) override;
 };
@@ -33,7 +33,7 @@ class ProcMacroConsumer : public clang::ASTConsumer {
 /// This class really just exists as the hook-up boilerplate for the sake of the clang
 /// compilation process.
 class ProcMacroPlugin : public clang::PluginASTAction {
-   protected:
+  protected:
     inline std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(
         clang::CompilerInstance &_ci,
         llvm::StringRef _in_file
