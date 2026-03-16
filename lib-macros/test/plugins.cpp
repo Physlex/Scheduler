@@ -7,10 +7,7 @@
 #include <clang/Tooling/Tooling.h>
 #include <gtest/gtest.h>
 
-TEST(
-    PluginsTestSuite,
-    TestSimple
-) {
+TEST(PluginsTestSuite, TestSimple) {
     const char *code =
         ""
         "#define gbox_executor clang::annotate(\"runtime\")\n"

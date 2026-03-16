@@ -35,15 +35,13 @@ class ProcMacroConsumer : public clang::ASTConsumer {
 class ProcMacroPlugin : public clang::PluginASTAction {
   protected:
     inline std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(
-        clang::CompilerInstance &_ci,
-        llvm::StringRef _in_file
+        clang::CompilerInstance &_ci, llvm::StringRef _in_file
     ) override {
         return std::make_unique<ProcMacroConsumer>();
     }
 
     inline bool ParseArgs(
-        const clang::CompilerInstance &_ci,
-        const std::vector<std::string> &_args
+        const clang::CompilerInstance &_ci, const std::vector<std::string> &_args
     ) override {
         return true;
     }

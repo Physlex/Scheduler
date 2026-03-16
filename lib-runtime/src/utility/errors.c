@@ -16,9 +16,7 @@ static const char *misuse_message =
 static const char *success_message = "No error detected.";
 static const char *memfull_message = "Unable to allocate more OS memory.";
 
-const char *code_into_error_msg(
-    error_code_k code
-) {
+const char *code_into_error_msg(error_code_k code) {
     const char *message = nullptr;
     switch (code) {
         case EC_SUCCESS:

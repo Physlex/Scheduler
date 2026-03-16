@@ -16,9 +16,7 @@ struct scheduler {
 static bool _scheduler_creation_locked = false;
 static scheduler_t _scheduler;
 
-int8_t sched_init(
-    uintptr_t queue_length
-) {
+int8_t sched_init(uintptr_t queue_length) {
     if (_scheduler_creation_locked) {
         return -EC_MISUSE;
     }
@@ -29,9 +27,7 @@ int8_t sched_init(
     return EC_SUCCESS;
 }
 
-int8_t sched_task(
-    struct task *task
-) {
+int8_t sched_task(struct task *task) {
     int8_t ret = ring_enqueue(_scheduler.task_queue, task);
     return ret;
 }

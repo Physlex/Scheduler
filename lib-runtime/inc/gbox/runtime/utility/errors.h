@@ -66,9 +66,7 @@ typedef enum error_code {
  *  @brief Forces the process into a global panic, halting the application.
  *  @param code The error code provided by the developer.
  */
-inline void error_panic(
-    error_code_k code
-) {
+inline void error_panic(error_code_k code) {
     while (1) {
         __asm volatile("nop");
     }

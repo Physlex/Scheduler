@@ -17,9 +17,7 @@
 #include "llvm/ADT/StringRef.h"
 
 // TODO: Demonstrate full s2s translation in-memory using the system described prior.
-TokenStream proc_macro_executor(
-    TokenStream input
-) {
+TokenStream proc_macro_executor(TokenStream input) {
     llvm::outs() << "invoked executor proc macro!";
     return input;
 }
@@ -28,22 +26,14 @@ TokenStream proc_macro_executor(
 namespace gbox {
 namespace parse {
 
-void literals(
-    TokenStream &stream,
-    clang::Token tok,
-    llvm::StringRef slice,
-    Span span
-) {
+void literals(TokenStream &stream, clang::Token tok, llvm::StringRef slice, Span span) {
     // TODO: Make some of these non-string types (crazy, right?)
     auto literal = Literal(slice.data(), span, Literal::Kind::String);
     stream.push_back(literal);
 }
 
 void identifiers(
-    TokenStream &stream,
-    clang::Token tok,
-    llvm::StringRef slice,
-    Span span
+    TokenStream &stream, clang::Token tok, llvm::StringRef slice, Span span
 ) {
     auto ident = Ident(slice.data(), span, tok.is(clang::tok::raw_identifier));
     stream.push_back(ident);
@@ -52,9 +42,7 @@ void identifiers(
 }  // namespace parse
 }  // namespace gbox
 
-void HandleFuncDecl::run(
-    const clang::ast_matchers::MatchFinder::MatchResult &res
-) {
+void HandleFuncDecl::run(const clang::ast_matchers::MatchFinder::MatchResult &res) {
     const clang::FunctionDecl *func_decl =
         res.Nodes.getNodeAs<clang::FunctionDecl>("funcDecl");
     if (!func_decl) {
@@ -127,9 +115,7 @@ void HandleFuncDecl::run(
     }
 }
 
-void ProcMacroConsumer::HandleTranslationUnit(
-    clang::ASTContext &ctx
-) {
+void ProcMacroConsumer::HandleTranslationUnit(clang::ASTContext &ctx) {
     HandleFuncDecl handler;
     clang::ast_matchers::MatchFinder finder;
 
@@ -138,5 +124,6 @@ void ProcMacroConsumer::HandleTranslationUnit(
     finder.matchAST(ctx);
 }
 
-static clang::FrontendPluginRegistry::Add<ProcMacroPlugin>
-    X("gbox-macros-plugin", "Procedural macro scheme for C/C++");
+static clang::FrontendPluginRegistry::Add<ProcMacroPlugin> X(
+    "gbox-macros-plugin", "Procedural macro scheme for C/C++"
+);
