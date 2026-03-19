@@ -146,20 +146,20 @@ wheels = [
 name = "scheduler-tools"
 version = "0.1.0"
 source = { virtual = "." }
-dependencies = [
-    { name = "pre-commit" },
-]
 
 [package.dev-dependencies]
 dev = [
     { name = "bake" },
+    { name = "pre-commit" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "pre-commit", specifier = ">=4.5.1" }]
 
 [package.metadata.requires-dev]
-dev = [{ name = "bake", editable = "tools/bake" }]
+dev = [
+    { name = "bake", editable = "tools/bake" },
+    { name = "pre-commit", specifier = ">=4.5.1" },
+]
 
 [[package]]
 name = "virtualenv"
