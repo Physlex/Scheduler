@@ -12,6 +12,7 @@
   in {
     devShells.${system}.default = pkgs.mkShell {
       buildInputs = with pkgs; [
+        pkgs.uv
         llvmPackages_latest.llvm
         llvmPackages_latest.libclang.dev
         llvmPackages_latest.libclang.lib

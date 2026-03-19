@@ -56,8 +56,6 @@ bool Parser::parse(
     } else {
         return this->parse_punctuation(in, tok, symbol, span);
     }
-
-    return true;
 }
 
 bool Parser::parse_identifiers(

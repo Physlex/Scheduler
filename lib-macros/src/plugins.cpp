@@ -23,6 +23,22 @@ using namespace gbox;
 // TODO: Demonstrate full s2s translation in-memory using the system described prior.
 TokenStream proc_macro_executor(TokenStream &input) { return TokenStream(); }
 
+void display(const TokenStream &stream, int indent = 0) {
+    std::string pad(indent * 2, ' ');
+    for (auto &token : stream) {
+        token.match(overloaded{
+            [&](const Ident &i)  { llvm::outs() << pad << "ident: " << i.symbol() << "\n"; },
+            [&](const Punc &p)   { llvm::outs() << pad << "punc: " << p.symbol() << "\n"; },
+            [&](const Literal &l){ llvm::outs() << pad << "literal: " << l.symbol() << "\n"; },
+            [&](const std::unique_ptr<Group> &g) {
+                llvm::outs() << pad << "group (\n";
+                display(g->tree(), indent + 1);
+                llvm::outs() << pad << ")\n";
+            },
+        });
+    }
+}
+
 void HandleFuncDecl::run(const clang::ast_matchers::MatchFinder::MatchResult &res) {
     const clang::FunctionDecl *func_decl =
         res.Nodes.getNodeAs<clang::FunctionDecl>("funcDecl");
@@ -96,25 +112,17 @@ void HandleFuncDecl::run(const clang::ast_matchers::MatchFinder::MatchResult &re
 
     // Invoke TokenStream proc macro plugins
 
-    for (size_t idx = 0; idx < annotations.size(); idx += 1) {
-        if (annotations[idx] == "executor") {
-            proc_macro_executor(stream);
-        }
-    }
+    // FIXME: Exactly what's on the tin
+    // for (size_t idx = 0; idx < annotations.size(); idx += 1) {
+    //     if (annotations[idx] == "executor") {
+    //         proc_macro_executor(stream);
+    //     }
+    // }
 
     // Match against each token, to process them individually as strings
 
     llvm::outs() << "Parsing complete! Token Tree: \n";
-    for (auto &token : stream) {
-        token.match(
-            overloaded{
-                [](Punc &p) { llvm::outs() << "punc: " << p.symbol() << "\n"; },
-                [](Ident &i) { llvm::outs() << "ident: " << i.symbol() << "\n"; },
-                [](Literal &l) { llvm::outs() << "literal: " << l.symbol() << "\n"; },
-                [](std::unique_ptr<Group> &g) { llvm::outs() << "group\n"; },
-            }
-        );
-    }
+    display(stream);
 }
 
 void ProcMacroConsumer::HandleTranslationUnit(clang::ASTContext &ctx) {

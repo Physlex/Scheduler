@@ -37,7 +37,7 @@ class TokenData {
   public:
     TokenData(Symbol sym, Span span) : sym_(std::move(sym)), span_(span) {}
 
-    inline Symbol symbol() const { return this->sym_; }
+    const inline Symbol &symbol() const { return this->sym_; }
 
     inline Span span() const { return this->span_; }
 
@@ -182,7 +182,7 @@ class TokenTree {
 
     /// TODO: DOCS
     template <typename Fn>
-    auto match(Fn &&f) {
+    auto match(Fn &&f) const {
         switch (this->kind_) {
             case Kind::Punc:
                 return f(this->value_.punc);
@@ -215,6 +215,10 @@ class Group {
 
     Group(TokenStream stream, Span span, Delimiter delim)
         : data_(std::move(stream), span), delim_(delim) {}
+
+    inline const TokenStream &tree() const {
+      return this->data_.symbol();
+    }
 
   private:
     TokenData<TokenStream> data_;
