@@ -162,9 +162,7 @@ bool Parser::parse_group(
 
     // Recursively parse each token within the inner group
     TokenStream inner;
-    while
-
-        ((this->idx_ < tail) && (this->parse_aux(inner)));
+    while ((this->idx_ < tail) && (this->parse_aux(inner)));
     if (this->idx_ != tail) return false;
 
     in.emplace_back(std::make_unique<Group>(std::move(inner), span, reduced_kind));
