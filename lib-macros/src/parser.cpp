@@ -21,17 +21,13 @@ using namespace gbox;
 namespace tok {
 
 static inline bool isLeftDelimiter(const clang::tok::TokenKind kind) {
-    return
-        clang::tok::l_paren == kind ||
-        clang::tok::l_brace == kind ||
-        clang::tok::l_square == kind;
+    return clang::tok::l_paren == kind || clang::tok::l_brace == kind ||
+           clang::tok::l_square == kind;
 }
 
 static inline bool isRightDelimiter(const clang::tok::TokenKind kind) {
-    return
-        clang::tok::r_paren == kind ||
-        clang::tok::r_brace == kind ||
-        clang::tok::r_square == kind;
+    return clang::tok::r_paren == kind || clang::tok::r_brace == kind ||
+           clang::tok::r_square == kind;
 }
 
 bool isDelimiter(const clang::tok::TokenKind kind) {
@@ -51,7 +47,8 @@ bool Parser::parse(
     } else if (tok::isLeftDelimiter(tok.getKind())) {
         return this->parse_group(in, tok, symbol, span);
     } else if (tok::isRightDelimiter(tok.getKind())) {
-        llvm::outs() << "Parser failed to notice left delim for token: " << tok.getKind() << "\n";
+        llvm::outs() << "Parser failed to notice left delim for token: " << tok.getKind()
+                     << "\n";
         return false;
     } else {
         return this->parse_punctuation(in, tok, symbol, span);
@@ -165,7 +162,9 @@ bool Parser::parse_group(
 
     // Recursively parse each token within the inner group
     TokenStream inner;
-    while ((this->idx_ < tail) && (this->parse_aux(inner)));
+    while
+
+        ((this->idx_ < tail) && (this->parse_aux(inner)));
     if (this->idx_ != tail) return false;
 
     in.emplace_back(std::make_unique<Group>(std::move(inner), span, reduced_kind));
