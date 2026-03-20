@@ -6,16 +6,25 @@
 #include <stdint.h>
 
 #include <memory>
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace gbox {
 
 class TokenTree;
 class Group;
 
-// Alias to a list of token tree types
-using TokenStream = std::vector<TokenTree>;
+/// TODO: DOCS
+class TokenStream : public std::vector<TokenTree> {
+  public:
+    inline std::string toString() const {
+        uint32_t cursor = 0;
+        return this->toString(cursor);
+    }
+
+  private:
+    std::string toString(uint32_t &cursor) const;
+};
 
 // TODO: DOCS
 class Span {
@@ -216,9 +225,11 @@ class Group {
     Group(TokenStream stream, Span span, Delimiter delim)
         : data_(std::move(stream), span), delim_(delim) {}
 
-    inline const TokenStream &tree() const {
-      return this->data_.symbol();
-    }
+    inline const TokenStream &tree() const { return this->data_.symbol(); }
+
+    inline const Span span() const { return this->data_.span(); }
+
+    inline const Delimiter kind() const { return this->delim_; }
 
   private:
     TokenData<TokenStream> data_;

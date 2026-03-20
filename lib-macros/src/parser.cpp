@@ -150,12 +150,17 @@ bool Parser::parse_group(
             return false;
         }
 
-        const auto tail_kind = this->clang_.raw_tokens.at(tail).getKind();
+        const clang::Token tail_match = this->clang_.raw_tokens.at(tail);
+        const auto tail_kind = tail_match.getKind();
         if (tail_kind == kind)
             depth++;
         else if (tail_kind == matching_kind)
             depth--;
     }
+
+    const clang::Token most_recent_match = this->clang_.raw_tokens.at(tail);
+    const uint32_t r_delim_start =
+        this->clang_.sm.getFileOffset(most_recent_match.getLocation());
 
     // skip the delimiter
     this->idx_ += 1;
@@ -165,7 +170,12 @@ bool Parser::parse_group(
     while ((this->idx_ < tail) && (this->parse_aux(inner)));
     if (this->idx_ != tail) return false;
 
-    in.emplace_back(std::make_unique<Group>(std::move(inner), span, reduced_kind));
+    in.emplace_back(
+        std::make_unique<Group>(
+            std::move(inner), Span(span.start(), r_delim_start), reduced_kind
+        )
+    );
+
     this->idx_ += 1;
     return true;
 }

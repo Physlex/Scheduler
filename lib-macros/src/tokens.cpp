@@ -5,8 +5,76 @@
 #include "gbox/macros/tokens.hpp"
 
 #include <memory>
+#include <string>
 
 using namespace gbox;
+
+std::string TokenStream::toString(uint32_t &cursor) const {
+    std::string res;
+
+    for (auto &node : *this) {
+        node.match(
+            overloaded{
+                [&res, &cursor](const Ident &i) {
+                    const auto start = i.span().start();
+                    for (; cursor < start; cursor += 1) res.push_back(' ');
+                    res.append(i.symbol());
+                    cursor += i.span().length();
+                },
+                [&res, &cursor](const Literal &l) {
+                    const auto start = l.span().start();
+                    for (; cursor < start; cursor += 1) res.push_back(' ');
+                    res.append(l.symbol());
+                    cursor += l.span().length();
+                },
+                [&res, &cursor](const Punc &p) {
+                    const auto start = p.span().start();
+                    for (; cursor < start; cursor += 1) res.push_back(' ');
+                    res.append((p.symbol() == ";") ? p.symbol() + "\n" : p.symbol());
+                    cursor += p.span().length();
+                },
+                [&res, &cursor](const std::unique_ptr<Group> &g) {
+                    std::string l_delim = "";
+                    std::string r_delim = "";
+
+                    switch (g->kind()) {
+                        case Group::Delimiter::Brace: {
+                            l_delim = "{\n";
+                            r_delim = "}\n";
+                            break;
+                        };
+
+                        case Group::Delimiter::Parenthesis: {
+                            l_delim = "(";
+                            r_delim = ")";
+                            break;
+                        };
+
+                        case Group::Delimiter::Square: {
+                            l_delim = "[";
+                            r_delim = "]";
+                            break;
+                        };
+                    }
+
+                    const auto start = g->span().start();
+                    for (; cursor < start; cursor += 1) res.push_back(' ');
+                    res.append(l_delim);
+                    cursor += 1;
+
+                    res.append(g->tree().toString(cursor));
+
+                    const auto length = g->span().length();
+                    for (; cursor < length; cursor += 1) res.push_back(' ');
+                    res.append(r_delim);
+                    cursor += 1;
+                },
+            }
+        );
+    }
+
+    return res;
+}
 
 TokenTree::TokenTree(Literal value) : value_(std::move(value)), kind_(Kind::Literal) {}
 TokenTree::TokenTree(Ident value) : value_(std::move(value)), kind_(Kind::Ident) {}

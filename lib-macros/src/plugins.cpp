@@ -23,22 +23,6 @@ using namespace gbox;
 // TODO: Demonstrate full s2s translation in-memory using the system described prior.
 TokenStream proc_macro_executor(TokenStream &input) { return TokenStream(); }
 
-void display(const TokenStream &stream, int indent = 0) {
-    std::string pad(indent * 2, ' ');
-    for (auto &token : stream) {
-        token.match(overloaded{
-            [&](const Ident &i)  { llvm::outs() << pad << "ident: " << i.symbol() << "\n"; },
-            [&](const Punc &p)   { llvm::outs() << pad << "punc: " << p.symbol() << "\n"; },
-            [&](const Literal &l){ llvm::outs() << pad << "literal: " << l.symbol() << "\n"; },
-            [&](const std::unique_ptr<Group> &g) {
-                llvm::outs() << pad << "group (\n";
-                display(g->tree(), indent + 1);
-                llvm::outs() << pad << ")\n";
-            },
-        });
-    }
-}
-
 void HandleFuncDecl::run(const clang::ast_matchers::MatchFinder::MatchResult &res) {
     const clang::FunctionDecl *func_decl =
         res.Nodes.getNodeAs<clang::FunctionDecl>("funcDecl");
@@ -81,6 +65,7 @@ void HandleFuncDecl::run(const clang::ast_matchers::MatchFinder::MatchResult &re
     // TODO: SIMPLIFY
     const size_t length = end - start + 1;
     std::string slice = sm.getBufferData(file).substr(start, length).str();
+    std::replace(slice.begin(), slice.end(), '\n', '\0');
     auto owned_buffer = llvm::MemoryBuffer::getMemBufferCopy(slice, "");
     auto buffer = owned_buffer->getMemBufferRef();
 
@@ -119,10 +104,12 @@ void HandleFuncDecl::run(const clang::ast_matchers::MatchFinder::MatchResult &re
     //     }
     // }
 
-    // Match against each token, to process them individually as strings
+    // Match against each token, to process them iqndividually as strings
 
     llvm::outs() << "Parsing complete! Token Tree: \n";
-    display(stream);
+    // TODO: As one string, not a vector of string.
+    std::string code = stream.toString();
+    llvm::outs() << code;
 }
 
 void ProcMacroConsumer::HandleTranslationUnit(clang::ASTContext &ctx) {
