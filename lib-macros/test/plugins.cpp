@@ -11,9 +11,10 @@ TEST(PluginsTestSuite, TestSimple) {
     const char *code =
         ""
         "#define gbox_executor clang::annotate(\"runtime\")\n"
+        "\n"
         "[[gbox_executor]]\n"
         "int main() { return 0; }"
         "";
 
-    clang::tooling::runToolOnCode(std::make_unique<gbox::ProcMacroPlugin>(), code);
+    clang::tooling::runToolOnCode(std::make_unique<gbox::ProcMacroAction>(), code);
 }

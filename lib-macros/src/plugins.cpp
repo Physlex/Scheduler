@@ -14,6 +14,8 @@
 
 #include <vector>
 
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Frontend/CompilerInstance.h"
 #include "gbox/macros/parser.hpp"
 #include "gbox/macros/tokens.hpp"
 #include "llvm/Support/raw_ostream.h"
@@ -65,9 +67,7 @@ void HandleFuncDecl::run(const clang::ast_matchers::MatchFinder::MatchResult &re
     // TODO: SIMPLIFY
     const size_t length = end - start + 1;
     std::string slice = sm.getBufferData(file).substr(start, length).str();
-    std::replace(slice.begin(), slice.end(), '\n', '\0');
-    auto owned_buffer = llvm::MemoryBuffer::getMemBufferCopy(slice, "");
-    auto buffer = owned_buffer->getMemBufferRef();
+    auto buffer = llvm::MemoryBufferRef(slice, "<scratch>");
 
     llvm::outs() << "Text:\n" << slice << "\n";
 
@@ -110,10 +110,17 @@ void HandleFuncDecl::run(const clang::ast_matchers::MatchFinder::MatchResult &re
     // TODO: As one string, not a vector of string.
     std::string code = stream.toString();
     llvm::outs() << code;
+
+    llvm::outs() << "\n ### WARNING ###\n\t>>> Attempting a rewrite...\n";
+    std::string test_code =
+        "static inline int32_t hello_msg(void *args) { printf(\"TEST: It Worked!\"); }";
+    const clang::SourceRange range = fdef->getSourceRange();
+    llvm::outs() << range.printToString(sm) << "\n";
+    this->rewriter_.ReplaceText(range, code);
 }
 
 void ProcMacroConsumer::HandleTranslationUnit(clang::ASTContext &ctx) {
-    HandleFuncDecl handler;
+    HandleFuncDecl handler(this->rewriter_);
     clang::ast_matchers::MatchFinder finder;
 
     // Match against function definitions
@@ -121,6 +128,11 @@ void ProcMacroConsumer::HandleTranslationUnit(clang::ASTContext &ctx) {
     finder.matchAST(ctx);
 }
 
-static clang::FrontendPluginRegistry::Add<ProcMacroPlugin> X(
-    "gbox-macros-plugin", "Procedural macro scheme for C/C++"
-);
+bool ProcMacroAction::BeginSourceFileAction(clang::CompilerInstance &ci) {
+    const clang::FrontendOptions opts = ci.getFrontendOpts();
+    if (opts.ProgramAction == clang::frontend::EmitObj) {
+        llvm::outs() << "Hello, Clang\n";
+        return true;
+    }
+    return false;
+}

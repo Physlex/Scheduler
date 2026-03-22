@@ -3,7 +3,7 @@
 
 file(GLOB_RECURSE GBOX_MACROS_CPP_SRC "${GBOX_MACROS_SRC_PATH}/*.cpp")
 
-add_library(${GBOX_MACROS_NAME} SHARED ${GBOX_MACROS_CPP_SRC})
+add_executable(${GBOX_MACROS_NAME} ${GBOX_MACROS_CPP_SRC})
 
 target_include_directories(
   ${GBOX_MACROS_NAME}

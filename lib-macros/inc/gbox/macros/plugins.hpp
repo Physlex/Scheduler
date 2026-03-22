@@ -10,17 +10,24 @@
 #include <clang/ASTMatchers/ASTMatchers.h>
 #include <clang/Frontend/CompilerInstance.h>
 #include <clang/Frontend/FrontendPluginRegistry.h>
+#include <clang/Rewrite/Core/Rewriter.h>
 
 #include <memory>
-#include <vector>
+
+#include "clang/Frontend/FrontendAction.h"
 
 namespace gbox {
 
 /// Boilerplate to handle clang
 class HandleFuncDecl : public clang::ast_matchers::MatchFinder::MatchCallback {
   public:
-    //! @brief Ru
+    HandleFuncDecl(clang::Rewriter &rewriter) : rewriter_(rewriter) {}
+
+    //! @brief TODO: DOCS
     void run(const clang::ast_matchers::MatchFinder::MatchResult &res) override;
+
+  private:
+    clang::Rewriter &rewriter_;
 };
 
 /**
@@ -28,27 +35,37 @@ class HandleFuncDecl : public clang::ast_matchers::MatchFinder::MatchCallback {
  */
 class ProcMacroConsumer : public clang::ASTConsumer {
   public:
+    ProcMacroConsumer(clang::Rewriter &rewriter) : rewriter_(rewriter) {}
+
     /// Override to handle each translation unit according to the consumer.
     void HandleTranslationUnit(clang::ASTContext &ctx) override;
+
+  private:
+    clang::Rewriter &rewriter_;
 };
 
 /// This class really just exists as the hook-up boilerplate for the sake of the clang
 /// compilation process.
-class ProcMacroPlugin : public clang::PluginASTAction {
-  protected:
+class ProcMacroAction : public clang::ASTFrontendAction {
+  public:
+    /// Public constructor
     inline std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(
-        clang::CompilerInstance &_ci, llvm::StringRef _in_file
+        clang::CompilerInstance &ci, llvm::StringRef _in_file
     ) override {
-        return std::make_unique<ProcMacroConsumer>();
+        rewriter_.setSourceMgr(ci.getSourceManager(), ci.getLangOpts());
+        return std::make_unique<ProcMacroConsumer>(rewriter_);
     }
 
-    inline bool ParseArgs(
-        const clang::CompilerInstance &_ci, const std::vector<std::string> &_args
-    ) override {
-        return true;
-    }
+    /**
+     * @brief callback before any given translation unit begins processing
+     *
+     * Ensures that the frontend action is called iff the main action expected
+     * from the compiler invocation is some form of emitter.
+     */
+    bool BeginSourceFileAction(clang::CompilerInstance &ci) override;
 
-    ActionType getActionType() override { return AddAfterMainAction; }
+  private:
+    clang::Rewriter rewriter_;
 };
 
 }  // namespace gbox
