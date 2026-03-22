@@ -86,8 +86,7 @@ class Parser {
     inline bool parse_aux(TokenStream &in) {
         const clang::Token curr_tok = this->clang_.raw_tokens.at(this->idx_);
 
-        const uint32_t tok_start =
-            this->clang_.sm.getFileOffset(curr_tok.getLocation());
+        const uint32_t tok_start = this->clang_.sm.getFileOffset(curr_tok.getLocation());
         const uint32_t tok_length = curr_tok.getLength();
         const char *text_start = this->file_.buffer.getBufferStart();
 

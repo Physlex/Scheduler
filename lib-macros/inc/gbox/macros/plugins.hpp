@@ -48,6 +48,9 @@ class ProcMacroConsumer : public clang::ASTConsumer {
 /// compilation process.
 class ProcMacroAction : public clang::ASTFrontendAction {
   public:
+    ProcMacroAction() = default;
+    virtual ~ProcMacroAction() = default;
+
     /// Public constructor
     inline std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(
         clang::CompilerInstance &ci, llvm::StringRef _in_file
@@ -63,6 +66,11 @@ class ProcMacroAction : public clang::ASTFrontendAction {
      * from the compiler invocation is some form of emitter.
      */
     bool BeginSourceFileAction(clang::CompilerInstance &ci) override;
+
+    /**
+     * @brief TODO: DOCS
+     */
+    void ExecuteAction() override {}
 
   private:
     clang::Rewriter rewriter_;

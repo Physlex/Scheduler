@@ -11,13 +11,13 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 
 set(GBOX_MACROS_NAME ${PROJECT_NAME}-macros)
+set(GBOX_CLANG_WRAPPER_NAME gbclang)
 set(PROJECT_CONF_PATH "${PROJECT_SOURCE_DIR}/cmake")
 set(PROJECT_EXAMPLE_PATH "${PROJECT_SOURCE_DIR}/examples")
 
 include(${PROJECT_CONF_PATH}/AddTests.cmake)
 include(${PROJECT_CONF_PATH}/AddExamples.cmake)
 include(${PROJECT_CONF_PATH}/TargetFormat.cmake)
-include(${PROJECT_CONF_PATH}/AddTarget.cmake)
 
 if(NOT CMAKE_C_COMPILER MATCHES "clang" OR NOT CMAKE_CXX_COMPILER MATCHES clang\\+\\+)
     message(FATAL_ERROR "clang improperly installed. Did you use `nix develop`?")
