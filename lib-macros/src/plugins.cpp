@@ -18,6 +18,7 @@
 #include "clang/Frontend/CompilerInstance.h"
 #include "gbox/macros/parser.hpp"
 #include "gbox/macros/tokens.hpp"
+#include "llvm/ADT/RewriteBuffer.h"
 #include "llvm/Support/raw_ostream.h"
 
 using namespace gbox;
@@ -58,7 +59,7 @@ void HandleFuncDecl::run(const clang::ast_matchers::MatchFinder::MatchResult &re
     clang::SourceLocation src_begin = src_range.getBegin();
     clang::SourceLocation src_end = src_range.getEnd();
 
-    clang::FileID file = sm.getFileID(src_begin);
+    auto file = sm.getFileID(src_begin);
     unsigned start = sm.getFileOffset(src_begin);
     unsigned end = sm.getFileOffset(src_end);
 
@@ -104,19 +105,16 @@ void HandleFuncDecl::run(const clang::ast_matchers::MatchFinder::MatchResult &re
     //     }
     // }
 
-    // Match against each token, to process them iqndividually as strings
+    // Match against each token, and generate C++ code from them
 
-    llvm::outs() << "Parsing complete! Token Tree: \n";
-    // TODO: As one string, not a vector of string.
     std::string code = stream.toString();
-    llvm::outs() << code;
+    // std::string test_code =
+    // "static inline int32_t hello_msg(void *args) { printf(\"TEST: It Worked!\"); }";
 
-    llvm::outs() << "\n ### WARNING ###\n\t>>> Attempting a rewrite...\n";
-    std::string test_code =
-        "static inline int32_t hello_msg(void *args) { printf(\"TEST: It Worked!\"); }";
+    llvm::outs() << "Attempting a rewrite...\n";
     const clang::SourceRange range = fdef->getSourceRange();
-    llvm::outs() << range.printToString(sm) << "\n";
     this->rewriter_.ReplaceText(range, code);
+    llvm::outs() << "rewrite succesfull!\n";
 }
 
 void ProcMacroConsumer::HandleTranslationUnit(clang::ASTContext &ctx) {
@@ -134,5 +132,20 @@ bool ProcMacroAction::BeginSourceFileAction(clang::CompilerInstance &ci) {
         llvm::outs() << "Hello, Clang\n";
         return true;
     }
+
     return false;
+}
+
+void ProcMacroAction::EndSourceFileAction() {
+    auto *buf = this->getRewriteBuffer();
+    if (buf) {
+        llvm::outs() << "Replaced code: \n";
+        llvm::outs() << std::string(buf->begin(), buf->end());
+    }
+}
+
+const llvm::RewriteBuffer *ProcMacroAction::getRewriteBuffer() {
+    return rewriter_.getRewriteBufferFor(
+        getCompilerInstance().getSourceManager().getMainFileID()
+    );
 }

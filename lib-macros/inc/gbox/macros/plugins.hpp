@@ -14,7 +14,10 @@
 
 #include <memory>
 
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Frontend/FrontendAction.h"
+#include "llvm/ADT/RewriteBuffer.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace gbox {
 
@@ -53,11 +56,14 @@ class ProcMacroAction : public clang::ASTFrontendAction {
 
     /// Public constructor
     inline std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(
-        clang::CompilerInstance &ci, llvm::StringRef _in_file
+        clang::CompilerInstance &ci, llvm::StringRef infile
     ) override {
+        this->infile_ = infile;
         rewriter_.setSourceMgr(ci.getSourceManager(), ci.getLangOpts());
         return std::make_unique<ProcMacroConsumer>(rewriter_);
     }
+
+    const llvm::RewriteBuffer *getRewriteBuffer();
 
     /**
      * @brief callback before any given translation unit begins processing
@@ -67,13 +73,12 @@ class ProcMacroAction : public clang::ASTFrontendAction {
      */
     bool BeginSourceFileAction(clang::CompilerInstance &ci) override;
 
-    /**
-     * @brief TODO: DOCS
-     */
-    void ExecuteAction() override {}
+    // TODO: DOCS
+    void EndSourceFileAction() override;
 
   private:
     clang::Rewriter rewriter_;
+    llvm::StringRef infile_;
 };
 
 }  // namespace gbox
