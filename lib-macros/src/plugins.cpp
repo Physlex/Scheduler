@@ -137,15 +137,13 @@ bool ProcMacroAction::BeginSourceFileAction(clang::CompilerInstance &ci) {
 }
 
 void ProcMacroAction::EndSourceFileAction() {
-    auto *buf = this->getRewriteBuffer();
+    const llvm::RewriteBuffer *buf = rewriter_.getRewriteBufferFor(
+        getCompilerInstance().getSourceManager().getMainFileID()
+    );
+
     if (buf) {
-        llvm::outs() << "Replaced code: \n";
-        llvm::outs() << std::string(buf->begin(), buf->end());
+        this->rewritten_ = std::string(buf->begin(), buf->end());
     }
 }
 
-const llvm::RewriteBuffer *ProcMacroAction::getRewriteBuffer() {
-    return rewriter_.getRewriteBufferFor(
-        getCompilerInstance().getSourceManager().getMainFileID()
-    );
-}
+std::string ProcMacroAction::getRewritten() const { return this->rewritten_; }

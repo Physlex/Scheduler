@@ -21,6 +21,8 @@ __pycache__
 
 # Nix
 .direnv
+result/
 
 # Scratchpad
 scratch.txt
+TODO.md

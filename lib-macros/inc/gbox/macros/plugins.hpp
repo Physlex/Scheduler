@@ -63,7 +63,7 @@ class ProcMacroAction : public clang::ASTFrontendAction {
         return std::make_unique<ProcMacroConsumer>(rewriter_);
     }
 
-    const llvm::RewriteBuffer *getRewriteBuffer();
+    std::string getRewritten() const;
 
     /**
      * @brief callback before any given translation unit begins processing
@@ -79,6 +79,7 @@ class ProcMacroAction : public clang::ASTFrontendAction {
   private:
     clang::Rewriter rewriter_;
     llvm::StringRef infile_;
+    std::string rewritten_;
 };
 
 }  // namespace gbox

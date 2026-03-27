@@ -15,6 +15,7 @@
 #include <unistd.h>
 
 #include <memory>
+#include <optional>
 
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Frontend/CompilerInstance.h"
@@ -23,6 +24,7 @@
 #include "gbox/macros/plugins.hpp"
 #include "llvm/ADT/IntrusiveRefCntPtr.h"
 #include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/FileSystem.h"
 #include "llvm/Support/raw_ostream.h"
 
 namespace gbox {
@@ -59,16 +61,20 @@ static void fixupDiagPrefixExeName(
     diag_client->setPrefix(std::string(exe_basename));
 }
 
-static bool createTempFile(
+// FIXME: AI-GENERATED (Too tired to give a fuck)
+static std::optional<std::string> createTempFile(
     clang::CompilerInvocation &invocation, gbox::ProcMacroAction &action
 ) {
-    const std::string &output = invocation.getFrontendOpts().OutputFile;
-    auto output_dir = std::string(llvm::sys::path::parent_path(output));
+    std::string rewritten = action.getRewritten();
+    if (rewritten.length() == 0) return std::nullopt;
 
-    llvm::SmallString<128> virtual_dir(output_dir);
+    const std::string &output = invocation.getFrontendOpts().OutputFile;
+    llvm::SmallString<128> virtual_dir(llvm::sys::path::parent_path(output));
     llvm::sys::path::append(virtual_dir, "virtual");
-    if (auto err = llvm::sys::fs::create_directories(virtual_dir)) {
-        return false;
+
+    if (llvm::sys::fs::create_directories(virtual_dir)) {
+        llvm::errs() << "failed to create virtual dir\n";
+        return std::nullopt;
     }
 
     llvm::SmallString<128> temp_model(virtual_dir);
@@ -81,17 +87,23 @@ static bool createTempFile(
     if (!tempfile) {
         llvm::errs() << "failed to create temp file: "
                      << llvm::toString(tempfile.takeError()) << "\n";
-        return false;
+        return std::nullopt;
     }
 
-    llvm::raw_fd_ostream out(tempfile->FD, false);
-    auto buf = action.getRewriteBuffer();
-    if (!buf) {
-        // No buffer rewrite has occured
-        return false;
+    // TODO: Why tf is this in a sub-group??
+    {
+        llvm::raw_fd_ostream out(tempfile->FD, /*shouldClose=*/false);
+        for (auto it = rewritten.begin(); it != rewritten.end(); ++it) out << *it;
     }
 
-    return true;
+    std::string path = tempfile->TmpName;
+    if (auto err = tempfile->keep()) {
+        llvm::errs() << "failed to keep temp file: " << llvm::toString(std::move(err))
+                     << "\n";
+        return std::nullopt;
+    }
+
+    return path;
 }
 
 }  // namespace cl
@@ -125,6 +137,7 @@ int32_t main(int argc, const char **argv) {
         driver.BuildCompilation(driver_args)
     );
 
+    std::optional<std::string> virtual_file_path = "";
     for (const auto &job : compilation->getJobs()) {
         const auto *cmd = llvm::dyn_cast<clang::driver::Command>(&job);
         if (!cmd) continue;
@@ -155,10 +168,10 @@ int32_t main(int argc, const char **argv) {
             return 1;
         }
 
-        gbox::cl::createTempFile(*invocation, action);
+        virtual_file_path = gbox::cl::createTempFile(*invocation, action);
     }
 
-    // TODO: What do I put here??
+    // TODO: Once this is done, we can finally fix all the AI-slop code!! Finally!!!!!
 
     return 0;
 }
