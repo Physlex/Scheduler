@@ -120,7 +120,6 @@ int32_t main(int argc, const char **argv) {
     diag_opts->DiagnosticSuppressionMappingsFile.clear();
 
     auto *diag_client = new clang::TextDiagnosticPrinter(llvm::errs(), *diag_opts);
-    gbox::cl::fixupDiagPrefixExeName(diag_client, abs_clang_path);
     llvm::IntrusiveRefCntPtr<clang::DiagnosticIDs> diag_id(new clang::DiagnosticIDs());
     llvm::IntrusiveRefCntPtr<clang::DiagnosticsEngine> diag(
         new clang::DiagnosticsEngine(diag_id, *diag_opts, diag_client)
@@ -133,9 +132,15 @@ int32_t main(int argc, const char **argv) {
         clang::driver::ToolChain::getTargetAndModeFromProgramName(argv[0]);
 
     driver.setTargetAndMode(target_and_mode);
+
     std::unique_ptr<clang::driver::Compilation> compilation(
         driver.BuildCompilation(driver_args)
     );
+    if (!compilation || diag->hasErrorOccurred()) {
+        return 1;
+    }
+
+    gbox::cl::fixupDiagPrefixExeName(diag_client, abs_clang_path);
 
     std::optional<std::string> virtual_file_path = "";
     for (const auto &job : compilation->getJobs()) {
@@ -171,7 +176,6 @@ int32_t main(int argc, const char **argv) {
         virtual_file_path = gbox::cl::createTempFile(*invocation, action);
     }
 
-    // TODO: Once this is done, we can finally fix all the AI-slop code!! Finally!!!!!
-
-    return 0;
+    llvm::SmallVector<llvm::StringRef> args(argv, argv + argc);
+    return llvm::sys::ExecuteAndWait(abs_clang_path, args);
 }

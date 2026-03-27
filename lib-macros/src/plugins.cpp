@@ -108,13 +108,10 @@ void HandleFuncDecl::run(const clang::ast_matchers::MatchFinder::MatchResult &re
     // Match against each token, and generate C++ code from them
 
     std::string code = stream.toString();
-    // std::string test_code =
-    // "static inline int32_t hello_msg(void *args) { printf(\"TEST: It Worked!\"); }";
-
-    llvm::outs() << "Attempting a rewrite...\n";
+    std::string test_code =
+        "static inline int32_t hello_msg(void *args) { printf(\"TEST: It Worked!\"); }";
     const clang::SourceRange range = fdef->getSourceRange();
-    this->rewriter_.ReplaceText(range, code);
-    llvm::outs() << "rewrite succesfull!\n";
+    this->rewriter_.ReplaceText(range, test_code);
 }
 
 void ProcMacroConsumer::HandleTranslationUnit(clang::ASTContext &ctx) {
