@@ -15,6 +15,18 @@
   flake-utils.lib.eachDefaultSystem (system:
     let
       pkgs = import nixpkgs { inherit system; };
+      cmakeFlags = [
+        "-DCMAKE_TOOLCHAIN_FILE=$PWD/cmake/clang-toolchain.cmake"
+        "-DCMAKE_C_COMPILER=${pkgs.llvmPackages_latest.clang}/bin/clang"
+        "-DCMAKE_CXX_COMPILER=${pkgs.llvmPackages_latest.clang}/bin/clang++"
+        "-DCMAKE_BUILD_TYPE=Debug"
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=1"
+      ];
+      cmakeEnv = ''
+        export LLVM_DIR=${pkgs.llvmPackages_latest.llvm.dev}/lib/cmake/llvm
+        export Clang_DIR=${pkgs.llvmPackages_latest.libclang.dev}/lib/cmake/clang
+        export LD_LIBRARY_PATH=${pkgs.stdenv.cc.cc.lib}/lib/
+      '';
     in {
       packages.default = pkgs.stdenv.mkDerivation {
         pname = "gbox";
@@ -36,16 +48,8 @@
         ];
 
         configurePhase = ''
-          export LLVM_DIR=${pkgs.llvmPackages_latest.llvm.dev}/lib/cmake/llvm
-          export Clang_DIR=${pkgs.llvmPackages_latest.libclang.dev}/lib/cmake/clang
-          export LD_LIBRARY_PATH=${pkgs.stdenv.cc.cc.lib}/lib/
-
-          cmake -B build -S . -G Ninja \
-              -DCMAKE_TOOLCHAIN_FILE=$PWD/cmake/clang-toolchain.cmake \
-              -DCMAKE_C_COMPILER=${pkgs.llvmPackages_latest.clang}/bin/clang \
-              -DCMAKE_CXX_COMPILER=${pkgs.llvmPackages_latest.clang}/bin/clang++ \
-              -D CMAKE_BUILD_TYPE=Debug \
-              -DCMAKE_EXPORT_COMPILE_COMMANDS=1
+          ${cmakeEnv}
+          cmake -B build -S . -G Ninja ${builtins.concatStringsSep " " cmakeFlags}
         '';
 
         buildPhase = ''
@@ -61,12 +65,17 @@
       };
 
       devShells.default = pkgs.mkShell {
-        packages = self.packages.${system}.default.buildInputs ++ [ pkgs.pre-commit pkgs.uv pkgs.gdb ];
+        packages = self.packages.${system}.default.buildInputs
+          ++ self.packages.${system}.default.nativeBuildInputs
+          ++ [ pkgs.pre-commit pkgs.uv pkgs.gdb ];
 
         shellHook = ''
-          export LLVM_DIR=${pkgs.llvmPackages_latest.llvm.dev}/lib/cmake/llvm
-          export Clang_DIR=${pkgs.llvmPackages_latest.libclang.dev}/lib/cmake/clang
-          export LD_LIBRARY_PATH=${pkgs.stdenv.cc.cc.lib}/lib/
+          ${cmakeEnv}
+
+          configure() {
+            cmake -B build -S . -G Ninja ${builtins.concatStringsSep " " cmakeFlags}
+          }
+
           echo "Nix development environment initialized."
         '';
       };
