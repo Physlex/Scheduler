@@ -6,8 +6,6 @@
 
 #include <string>
 
-#include "gbox/macros/plugins.hpp"
-
 namespace gbox {
 namespace cli {
 

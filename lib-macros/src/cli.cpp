@@ -48,25 +48,24 @@ void fixupDiagPrefixExeName(
 }
 
 std::string writeVirtualFile(
-    const std::string &input_file, const std::string &rewritten_file,
+    const std::string &input_file, const std::string &rewritten_content,
     const std::string &output_dir
 ) {
-    llvm::Expected<llvm::sys::fs::TempFile> temp_file =
-        llvm::sys::fs::TempFile::create(rewritten_file);
-    if (!temp_file) {
-        llvm::consumeError(temp_file.takeError());
+    auto virtual_path = llvm::SmallString<128>(output_dir);
+    llvm::sys::path::append(
+        virtual_path, llvm::sys::path::stem(input_file) + ".gbox.cpp"
+    );
+
+    std::error_code ec;
+    auto out = llvm::raw_fd_ostream(virtual_path.str(), ec);
+    if (ec) {
+        llvm::outs() << "ERROR\n";
         return "";
     }
 
-    auto out = llvm::raw_fd_ostream(temp_file->FD, false);
-    for (auto it = rewritten_file.begin(); it != rewritten_file.end(); ++it) out << *it;
+    out << rewritten_content;
 
-    if (auto err = temp_file->keep()) {
-        llvm::consumeError(std::move(err));
-        return "";
-    }
-
-    return temp_file->TmpName;
+    return std::string(virtual_path);
 }
 
 }  // namespace cli

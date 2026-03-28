@@ -26,6 +26,7 @@
 
 #include "gbox/macros/cli.hpp"
 #include "gbox/macros/plugins.hpp"
+#include "llvm/ADT/SmallString.h"
 
 /**
  * @brief Entry point to the program.
@@ -95,12 +96,15 @@ int32_t main(int argc, const char **argv) {
         }
 
         auto frontend_opts = invocation->getFrontendOpts();
-        const std::string &output_dir = frontend_opts.OutputFile;
+        auto output_dir = llvm::SmallString<128>(frontend_opts.OutputFile);
+        llvm::sys::path::remove_filename(output_dir);
+
+        std::string rewritten = action.getRewritten();
+        llvm::outs() << rewritten << "\n";
         for (const auto &input_file : invocation->getFrontendOpts().Inputs) {
-            std::string rewritten = action.getRewritten();
             if (rewritten.size() > 0) {
                 auto virtual_path = gbox::cli::writeVirtualFile(
-                    input_file.getFile().str(), rewritten, output_dir
+                    input_file.getFile().str(), rewritten, std::string(output_dir)
                 );
                 true_list.push_back(virtual_path);
             } else {
@@ -108,9 +112,6 @@ int32_t main(int argc, const char **argv) {
             }
         }
     }
-
-    llvm::outs() << "Printing true list...\n";
-    for (auto item : true_list) llvm::outs() << item.c_str();
 
     llvm::SmallVector<llvm::StringRef> args(argv, argv + argc);
     return llvm::sys::ExecuteAndWait(abs_clang_path, args);
