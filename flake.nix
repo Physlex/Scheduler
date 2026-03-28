@@ -72,6 +72,16 @@
         shellHook = ''
           ${cmakeEnv}
 
+          cat > ./.clangd <<EOF
+          CompileFlags:
+            CompilationDatabase: build
+            Add:
+              - -I${pkgs.llvmPackages_latest.llvm.dev}/include
+              - -I${pkgs.llvmPackages_latest.libclang.dev}/include
+          Index:
+            Background: Build
+          EOF
+
           configure() {
             cmake -B build -S . -G Ninja ${builtins.concatStringsSep " " cmakeFlags}
           }

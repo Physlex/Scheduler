@@ -4,7 +4,6 @@
 #include <clang/Frontend/CompilerInvocation.h>
 #include <clang/Frontend/TextDiagnosticPrinter.h>
 
-#include <optional>
 #include <string>
 
 #include "gbox/macros/plugins.hpp"
@@ -24,8 +23,9 @@ extern void fixupDiagPrefixExeName(
 );
 
 // TODO: DOCS
-extern std::optional<std::string> createTempFile(
-    clang::CompilerInvocation &invocation, gbox::ProcMacroAction &action
+std::string writeVirtualFile(
+    const std::string &input_file, const std::string &rewritten_file,
+    const std::string &output_dir
 );
 
 }  // namespace cli

@@ -23,7 +23,6 @@
 #include <unistd.h>
 
 #include <memory>
-#include <optional>
 
 #include "gbox/macros/cli.hpp"
 #include "gbox/macros/plugins.hpp"
@@ -64,7 +63,7 @@ int32_t main(int argc, const char **argv) {
 
     gbox::cli::fixupDiagPrefixExeName(diag_client, abs_clang_path);
 
-    std::optional<std::string> virtual_file_path = "";
+    std::vector<std::string> true_list;
     for (const auto &job : compilation->getJobs()) {
         const auto *cmd = llvm::dyn_cast<clang::driver::Command>(&job);
         if (!cmd) continue;
@@ -95,8 +94,23 @@ int32_t main(int argc, const char **argv) {
             return 1;
         }
 
-        virtual_file_path = gbox::cli::createTempFile(*invocation, action);
+        auto frontend_opts = invocation->getFrontendOpts();
+        const std::string &output_dir = frontend_opts.OutputFile;
+        for (const auto &input_file : invocation->getFrontendOpts().Inputs) {
+            std::string rewritten = action.getRewritten();
+            if (rewritten.size() > 0) {
+                auto virtual_path = gbox::cli::writeVirtualFile(
+                    input_file.getFile().str(), rewritten, output_dir
+                );
+                true_list.push_back(virtual_path);
+            } else {
+                true_list.push_back(input_file.getFile().str());
+            }
+        }
     }
+
+    llvm::outs() << "Printing true list...\n";
+    for (auto item : true_list) llvm::outs() << item.c_str();
 
     llvm::SmallVector<llvm::StringRef> args(argv, argv + argc);
     return llvm::sys::ExecuteAndWait(abs_clang_path, args);

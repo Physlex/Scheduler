@@ -126,7 +126,6 @@ void ProcMacroConsumer::HandleTranslationUnit(clang::ASTContext &ctx) {
 bool ProcMacroAction::BeginSourceFileAction(clang::CompilerInstance &ci) {
     const clang::FrontendOptions opts = ci.getFrontendOpts();
     if (opts.ProgramAction == clang::frontend::EmitObj) {
-        llvm::outs() << "Hello, Clang\n";
         return true;
     }
 

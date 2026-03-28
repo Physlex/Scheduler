@@ -11,6 +11,7 @@
 #include <llvm/Support/Program.h>
 
 #include "gbox/macros/plugins.hpp"
+#include "llvm/Support/Error.h"
 
 namespace gbox {
 namespace cli {
@@ -46,48 +47,26 @@ void fixupDiagPrefixExeName(
     diag_client->setPrefix(std::string(exe_basename));
 }
 
-std::optional<std::string> createTempFile(
-    clang::CompilerInvocation &invocation, gbox::ProcMacroAction &action
+std::string writeVirtualFile(
+    const std::string &input_file, const std::string &rewritten_file,
+    const std::string &output_dir
 ) {
-    std::string rewritten = action.getRewritten();
-    if (rewritten.length() == 0) return std::nullopt;
-
-    const std::string &output = invocation.getFrontendOpts().OutputFile;
-    llvm::SmallString<128> virtual_dir(llvm::sys::path::parent_path(output));
-    llvm::sys::path::append(virtual_dir, "virtual");
-
-    if (llvm::sys::fs::create_directories(virtual_dir)) {
-        llvm::errs() << "failed to create virtual dir\n";
-        return std::nullopt;
+    llvm::Expected<llvm::sys::fs::TempFile> temp_file =
+        llvm::sys::fs::TempFile::create(rewritten_file);
+    if (!temp_file) {
+        llvm::consumeError(temp_file.takeError());
+        return "";
     }
 
-    llvm::SmallString<128> temp_model(virtual_dir);
-    llvm::sys::path::append(
-        temp_model,
-        llvm::sys::path::stem(invocation.getFrontendOpts().Inputs[0].getFile())
-    );
+    auto out = llvm::raw_fd_ostream(temp_file->FD, false);
+    for (auto it = rewritten_file.begin(); it != rewritten_file.end(); ++it) out << *it;
 
-    auto tempfile = llvm::sys::fs::TempFile::create(temp_model + "-%%%%%%.c");
-    if (!tempfile) {
-        llvm::errs() << "failed to create temp file: "
-                     << llvm::toString(tempfile.takeError()) << "\n";
-        return std::nullopt;
+    if (auto err = temp_file->keep()) {
+        llvm::consumeError(std::move(err));
+        return "";
     }
 
-    // TODO: Why tf is this in a sub-group??
-    {
-        llvm::raw_fd_ostream out(tempfile->FD, /*shouldClose=*/false);
-        for (auto it = rewritten.begin(); it != rewritten.end(); ++it) out << *it;
-    }
-
-    std::string path = tempfile->TmpName;
-    if (auto err = tempfile->keep()) {
-        llvm::errs() << "failed to keep temp file: " << llvm::toString(std::move(err))
-                     << "\n";
-        return std::nullopt;
-    }
-
-    return path;
+    return temp_file->TmpName;
 }
 
 }  // namespace cli
