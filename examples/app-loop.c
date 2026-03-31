@@ -12,18 +12,18 @@
 
 struct user_main_task_args {
     int32_t argc;
-    char** argv;
+    char **argv;
 };
 
-// This should really be something that can be automatically "reinterpreted" and
-// type-specified
+/// This should really be something that can be automatically "reinterpreted"
+/// and type-specified
 [[clang::annotate("task")]]
-async static inline int32_t hello_msg(void* low_level_msg) {
+async static inline int32_t hello_msg(void *low_level_msg) {
     if (!low_level_msg) {
         return -EC_REQUIRES;
     }
 
-    printf("Hello, %s!\n", (const char*)low_level_msg);
+    printf("Hello, %s!\n", (const char *)low_level_msg);
 
     return EC_SUCCESS;
 }
@@ -31,8 +31,8 @@ async static inline int32_t hello_msg(void* low_level_msg) {
 /// Meanwhile, this will be the original "main", which is generated via
 /// attribute
 [[clang::annotate("executor")]]
-async int32_t user_main(void* args) {
-    struct user_main_task_args args_actual = *(struct user_main_task_args*)args;
+async int32_t user_main(void *args) {
+    struct user_main_task_args args_actual = *(struct user_main_task_args *)args;
 
     task_t task_0 = simple_task_create(hello_msg, "Hello");
     task_t task_1 = simple_task_create(hello_msg, "World");
@@ -57,15 +57,14 @@ async int32_t user_main(void* args) {
     return 0;
 }
 
-// In theory, this will eventually be generated boilerplate for the "true"
-// entrypoint
-async int32_t main(int32_t argc, char** argv) {
+/// In theory, this will eventually be generated boilerplate for the "true"
+/// entrypoint
+int32_t main(int32_t argc, char **argv) {
     uint32_t maximum_num_tasks = 100;
     sched_init(maximum_num_tasks);
 
     struct user_main_task_args user_main_args = {.argc = argc, .argv = argv};
-    task_t user_main_task =
-        simple_task_create(user_main, (void*)&user_main_args);
+    task_t user_main_task = simple_task_create(user_main, (void *)&user_main_args);
     sched_task(&user_main_task);
 
     // Ideally, we should be able to yield tasks early and return their result,

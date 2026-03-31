@@ -3,38 +3,91 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
+    flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs }:
-  let
-    system = "x86_64-linux";  # adjust if needed
-    pkgs = import nixpkgs { inherit system; };
-  in {
-    devShells.${system}.default = pkgs.mkShell {
-      buildInputs = with pkgs; [
-        llvmPackages_latest.llvm
-        llvmPackages_latest.clang
-        llvmPackages_latest.libclang.dev
-        llvmPackages_latest.libclang.lib
-        llvmPackages_latest.llvm.dev
-        gdb
-        gtest
+  outputs = {
+    self,
+    nixpkgs,
+    flake-utils,
+    ...
+  }:
+  flake-utils.lib.eachDefaultSystem (system:
+    let
+      pkgs = import nixpkgs { inherit system; };
+      cmakeFlags = [
+        "-DCMAKE_TOOLCHAIN_FILE=$PWD/cmake/clang-toolchain.cmake"
+        "-DCMAKE_C_COMPILER=${pkgs.llvmPackages_latest.clang}/bin/clang"
+        "-DCMAKE_CXX_COMPILER=${pkgs.llvmPackages_latest.clang}/bin/clang++"
+        "-DCMAKE_BUILD_TYPE=Debug"
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=1"
       ];
-
-      nativeBuildInputs = with pkgs; [
-        ninja
-        cmake
-      ];
-
-      shellHook = ''
-        export LLVM_DIR=${pkgs.llvmPackages.llvm.dev}/lib/cmake/llvm
-        export Clang_DIR=${pkgs.llvmPackages.libclang.dev}/lib/cmake/clang
-        echo "Nix development environment initialized."
-        cmake -B build -S . -G Ninja \
-          -DCMAKE_TOOLCHAIN_FILE=cmake/clang-toolchain.cmake \
-          -DCMAKE_EXPORT_COMPILE_COMMANDS=On
-        ln -s ./build/compile_commands.json ./build/
+      cmakeEnv = ''
+        export LLVM_DIR=${pkgs.llvmPackages_latest.llvm.dev}/lib/cmake/llvm
+        export Clang_DIR=${pkgs.llvmPackages_latest.libclang.dev}/lib/cmake/clang
+        export LD_LIBRARY_PATH=${pkgs.stdenv.cc.cc.lib}/lib/
       '';
-    };
-  };
+    in {
+      packages.default = pkgs.stdenv.mkDerivation {
+        pname = "gbox";
+        version = "0.1.0";
+        src = ./.;
+
+        nativeBuildInputs = with pkgs; [
+          ninja
+          cmake
+          gtest
+          llvmPackages_latest.clang
+        ];
+
+        buildInputs = with pkgs; [
+          llvmPackages_latest.llvm
+          llvmPackages_latest.libclang.dev
+          llvmPackages_latest.libclang.lib
+          llvmPackages_latest.llvm.dev
+        ];
+
+        configurePhase = ''
+          ${cmakeEnv}
+          cmake -B build -S . -G Ninja ${builtins.concatStringsSep " " cmakeFlags}
+        '';
+
+        buildPhase = ''
+          ninja -C build
+        '';
+
+        installPhase = ''
+          mkdir -p $out/bin $out/lib $out/include
+          cp build/bin/gbclang $out/bin/
+          cp build/lib/libgbox-runtime.a $out/lib/
+          cp -r lib-runtime/inc $out/include
+        '';
+      };
+
+      devShells.default = pkgs.mkShell {
+        packages = self.packages.${system}.default.buildInputs
+          ++ self.packages.${system}.default.nativeBuildInputs
+          ++ [ pkgs.pre-commit pkgs.uv pkgs.gdb ];
+
+        shellHook = ''
+          ${cmakeEnv}
+
+          cat > ./.clangd <<EOF
+          CompileFlags:
+            CompilationDatabase: build
+            Add:
+              - -I${pkgs.llvmPackages_latest.llvm.dev}/include
+              - -I${pkgs.llvmPackages_latest.libclang.dev}/include
+          Index:
+            Background: Build
+          EOF
+
+          configure() {
+            cmake -B build -S . -G Ninja ${builtins.concatStringsSep " " cmakeFlags}
+          }
+
+          echo "Nix development environment initialized."
+        '';
+      };
+    });
 }

@@ -4,14 +4,16 @@
 
 #include "gbox/runtime/tasks.h"
 
-#include <gtest/gtest.h>
+#include <stdio.h>
+
+#include "gtest/gtest.h"
 
 /** @defgroup simple task callback simpleTaskCallbacks
  *  @brief This group defines a set of callbacks to be used during tests.
  *  @{
  */
 
-int32_t hello_world(void* args) {
+int32_t hello_world(void *args) {
     printf("Hello, World!\n");
     return 0;
 }

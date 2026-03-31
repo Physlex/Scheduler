@@ -38,7 +38,7 @@ typedef double float64_t;
  *         returning a structure to be seized by some controller. Instead, it
  *         is expected to die after firing.
  */
-typedef int32_t (*gen_callback_ptr_t)(void*);
+typedef int32_t (*gen_callback_ptr_t)(void *);
 
 /** @} */
 

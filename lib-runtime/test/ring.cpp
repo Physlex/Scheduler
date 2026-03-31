@@ -6,13 +6,11 @@
 
 #include <gtest/gtest.h>
 
-#include "gbox/runtime/utility/errors.h"
-
 TEST(ringCreate, ringTests) {
     const uint32_t ring_size = sizeof(float32_t);
     const uint32_t ring_len = 4;
 
-    ring_t* ring = ring_new(ring_size, ring_len);
+    ring_t *ring = ring_new(ring_size, ring_len);
     ASSERT_NE(nullptr, ring);
 
     ASSERT_EQ(0, ring_destroy(&ring));
@@ -31,10 +29,10 @@ TEST(ringQueue, ringTests) {
     const uint32_t ring_len = 4;
     const uint32_t datum = 1;
 
-    ring_t* ring = ring_new(ring_size, ring_len);
+    ring_t *ring = ring_new(ring_size, ring_len);
 
     ASSERT_NE(nullptr, ring);
-    ASSERT_EQ(0, ring_enqueue(ring, (void*)&datum));
+    ASSERT_EQ(0, ring_enqueue(ring, (void *)&datum));
     ASSERT_EQ(0, ring_destroy(&ring));
 }
 
@@ -42,13 +40,13 @@ TEST(ringQueueDequeueUint32, ringTests) {
     const uint32_t ring_size = sizeof(int32_t);
     const uint32_t ring_len = 2;
 
-    ring_t* ring = ring_new(ring_size, ring_len);
+    ring_t *ring = ring_new(ring_size, ring_len);
 
     uint32_t datum = 10;
-    ASSERT_EQ(0, ring_enqueue(ring, (void*)&datum));
+    ASSERT_EQ(0, ring_enqueue(ring, (void *)&datum));
 
     uint32_t old_datum = 0;
-    ASSERT_EQ(0, ring_dequeue(ring, (void*)&old_datum));
+    ASSERT_EQ(0, ring_dequeue(ring, (void *)&old_datum));
 
     ASSERT_EQ(old_datum, datum);
 
@@ -58,15 +56,15 @@ TEST(ringQueueDequeueUint32, ringTests) {
 TEST(ringQueueDequeue, ringTests) {
     const uint32_t ring_size = sizeof(float32_t);
     const uint32_t ring_len = 4;
-    ring_t* ring = ring_new(ring_size, ring_len);
+    ring_t *ring = ring_new(ring_size, ring_len);
 
     ASSERT_NE(nullptr, ring);
 
     const float32_t datum = 1.f;
     float32_t new_datum = 0.f;
 
-    ASSERT_EQ(0, ring_enqueue(ring, (void*)&datum));
-    ASSERT_EQ(0, ring_dequeue(ring, (void*)&new_datum));
+    ASSERT_EQ(0, ring_enqueue(ring, (void *)&datum));
+    ASSERT_EQ(0, ring_dequeue(ring, (void *)&new_datum));
 
     ASSERT_FLOAT_EQ(datum, new_datum);
 
@@ -77,7 +75,7 @@ TEST(ringQueueDequeue, ringTests) {
 TEST(ringOverrun, ringTests) {
     const uint32_t ring_size = sizeof(uint32_t);
     const uint32_t ring_len = 2;
-    ring_t* ring = ring_new(ring_size, ring_len);
+    ring_t *ring = ring_new(ring_size, ring_len);
 
     ASSERT_NE(nullptr, ring);
 
@@ -98,7 +96,7 @@ TEST(ringOverrun, ringTests) {
 TEST(ringOverrunP1, ringTests) {
     const uint32_t ring_size = sizeof(uint32_t);
     const uint32_t ring_len = 2;
-    ring_t* ring = ring_new(ring_size, ring_len);
+    ring_t *ring = ring_new(ring_size, ring_len);
 
     ASSERT_NE(nullptr, ring);
 

@@ -6,57 +6,82 @@
  */
 
 #include <clang/AST/ASTConsumer.h>
-#include <clang/AST/ASTContext.h>
-#include <clang/AST/Attr.h>
-#include <clang/AST/RecursiveASTVisitor.h>
-#include <clang/Frontend/FrontendAction.h>
+#include <clang/ASTMatchers/ASTMatchFinder.h>
+#include <clang/ASTMatchers/ASTMatchers.h>
+#include <clang/Frontend/CompilerInstance.h>
 #include <clang/Frontend/FrontendPluginRegistry.h>
+#include <clang/Rewrite/Core/Rewriter.h>
 
-using namespace clang;
-using namespace clang::tooling;
-using namespace llvm;
+#include <memory>
 
-class FindMyAttributeVisitor
-    : public RecursiveASTVisitor<FindMyAttributeVisitor> {
-   public:
-    FindMyAttributeVisitor(ASTContext& ctx) : ctx(ctx) {}
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Frontend/FrontendAction.h"
+#include "llvm/ADT/RewriteBuffer.h"
+#include "llvm/ADT/StringRef.h"
 
-    // Visit an attribute.
-    bool VisitAttr(Attr* attr) {
-        attr->printPretty(llvm::outs(), ctx.getPrintingPolicy());
-        return true;
-    }
+namespace gbox {
 
-   private:
-    ASTContext& ctx;
+/// Boilerplate to handle clang
+class HandleFuncDecl : public clang::ast_matchers::MatchFinder::MatchCallback {
+  public:
+    HandleFuncDecl(clang::Rewriter &rewriter) : rewriter_(rewriter) {}
+
+    //! @brief TODO: DOCS
+    void run(const clang::ast_matchers::MatchFinder::MatchResult &res) override;
+
+  private:
+    clang::Rewriter &rewriter_;
 };
 
-class FindMyAttributeConsumer : public ASTConsumer {
-   public:
-    virtual void HandleTranslationUnit(ASTContext& ctx) {
-        FindMyAttributeVisitor visitor(ctx);
-        visitor.TraverseDecl(ctx.getTranslationUnitDecl());
-    }
+/**
+ *  @brief This method implements the "frontend" logic for parsing each t-unit
+ */
+class ProcMacroConsumer : public clang::ASTConsumer {
+  public:
+    ProcMacroConsumer(clang::Rewriter &rewriter) : rewriter_(rewriter) {}
+
+    /// Override to handle each translation unit according to the consumer.
+    void HandleTranslationUnit(clang::ASTContext &ctx) override;
+
+  private:
+    clang::Rewriter &rewriter_;
 };
 
-class FindMyAttributeAction : public ASTFrontendAction {
-   public:
-    virtual std::unique_ptr<ASTConsumer> CreateASTConsumer(
-        CompilerInstance& Compiler, StringRef InFile) {
-        return std::make_unique<FindMyAttributeConsumer>();
+/// This class really just exists as the hook-up boilerplate for the sake of the clang
+/// compilation process.
+class ProcMacroAction : public clang::ASTFrontendAction {
+  public:
+    ProcMacroAction() = default;
+    virtual ~ProcMacroAction() = default;
+
+    /// Public constructor
+    inline std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(
+        clang::CompilerInstance &ci, llvm::StringRef infile
+    ) override {
+        this->infile_ = infile;
+        rewriter_.setSourceMgr(ci.getSourceManager(), ci.getLangOpts());
+        return std::make_unique<ProcMacroConsumer>(rewriter_);
     }
+
+    std::string getRewritten() const;
+
+    /**
+     * @brief callback before any given translation unit begins processing
+     *
+     * Ensures that the frontend action is called iff the main action expected
+     * from the compiler invocation is some form of emitter.
+     */
+    bool BeginSourceFileAction(clang::CompilerInstance &ci) override;
+
+    // TODO: DOCS
+    void EndSourceFileAction() override;
+
+  private:
+    clang::Rewriter rewriter_;
+    llvm::StringRef infile_;
+    std::string rewritten_;
 };
 
-struct ExampleAttributeInfo : public ParsedAttrInfo {
-    ExampleAttributeInfo() {
-        static constexpr Spelling attrib_spellings[3] = {
-            {ParsedAttr::AS_CXX11, "runtime"},
-            {ParsedAttr::AS_C23, "gbox::runtime"},
-            {ParsedAttr::AS_GNU, "runtime"},
-        };
-
-        this->Spellings = attrib_spellings;
-    }
-};
+}  // namespace gbox
 
 #endif  // GBOX_MACROS_PLUGINS_HPP_
