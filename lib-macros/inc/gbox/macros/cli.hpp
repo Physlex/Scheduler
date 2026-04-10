@@ -9,6 +9,8 @@
 namespace gbox {
 namespace cli {
 
+class ArgumentParser {};
+
 // TODO: DOCS
 extern std::string stripGBFromPath(std::string path);
 

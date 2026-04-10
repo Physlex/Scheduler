@@ -14,7 +14,6 @@
 
 #include <memory>
 
-#include "clang/Basic/SourceLocation.h"
 #include "clang/Frontend/FrontendAction.h"
 #include "llvm/ADT/RewriteBuffer.h"
 #include "llvm/ADT/StringRef.h"

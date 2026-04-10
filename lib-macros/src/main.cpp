@@ -23,6 +23,7 @@
 #include <unistd.h>
 
 #include <memory>
+#include <vector>
 
 #include "gbox/macros/cli.hpp"
 #include "gbox/macros/plugins.hpp"
@@ -72,8 +73,9 @@ int32_t main(int argc, const char **argv) {
         const llvm::opt::ArgStringList &args = cmd->getArguments();
         if (!llvm::is_contained(args, llvm::StringRef("-emit-obj"))) continue;
 
-        const auto args_slice =
-            llvm::ArrayRef<const char *>(args.data() + 1, args.size() - 1);
+        const char *const *begin = args.data() + 1;
+        const char *const *end = begin + args.size() - 1;
+        auto args_slice = std::vector<const char *>(begin, end);
 
         auto invocation = std::make_shared<clang::CompilerInvocation>();
         if (!clang::CompilerInvocation::CreateFromArgs(*invocation, args_slice, *diag)) {
