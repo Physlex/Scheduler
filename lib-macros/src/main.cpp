@@ -25,6 +25,7 @@
 #include <memory>
 #include <vector>
 
+#include "gbox/macros/adapter.hpp"
 #include "gbox/macros/cli.hpp"
 #include "gbox/macros/plugins.hpp"
 #include "llvm/ADT/SmallString.h"
@@ -77,42 +78,8 @@ int32_t main(int argc, const char **argv) {
         const char *const *end = begin + args.size() - 1;
         auto args_slice = std::vector<const char *>(begin, end);
 
-        auto invocation = std::make_shared<clang::CompilerInvocation>();
-        if (!clang::CompilerInvocation::CreateFromArgs(*invocation, args_slice, *diag)) {
-            llvm::errs() << "Failed to create compiler invocation\n";
-            return 1;
-        }
-
-        auto ci = clang::CompilerInstance(invocation);
-        ci.setDiagnostics(diag.get());
-
-        auto action = gbox::ProcMacroAction();
-        if (!ci.ExecuteAction(action)) {
-            llvm::errs() << "failed to execute proc macro action\n";
-            return 1;
-        }
-
-        if (ci.getDiagnostics().hasErrorOccurred()) {
-            llvm::errs() << "errors occurred during compilation\n";
-            return 1;
-        }
-
-        auto frontend_opts = invocation->getFrontendOpts();
-        auto output_dir = llvm::SmallString<128>(frontend_opts.OutputFile);
-        llvm::sys::path::remove_filename(output_dir);
-
-        std::string rewritten = action.getRewritten();
-        llvm::outs() << rewritten << "\n";
-        for (const auto &input_file : invocation->getFrontendOpts().Inputs) {
-            if (rewritten.size() > 0) {
-                auto virtual_path = gbox::cli::writeVirtualFile(
-                    input_file.getFile().str(), rewritten, std::string(output_dir)
-                );
-                true_list.push_back(virtual_path);
-            } else {
-                true_list.push_back(input_file.getFile().str());
-            }
-        }
+        auto action = gbox::adapter::Action(*diag);
+        action.execute(args_slice);
     }
 
     llvm::SmallVector<llvm::StringRef> args(argv, argv + argc);
