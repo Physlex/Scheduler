@@ -1,5 +1,5 @@
-#ifndef GBOX_MACROS_PROC_MACRO_TOKENS_HPP_
-#define GBOX_MACROS_PROC_MACRO_TOKENS_HPP_
+#ifndef GBOX_MACROS_CODEGEN_TOKENS_HPP_
+#define GBOX_MACROS_CODEGEN_TOKENS_HPP_
 
 // TODO: DOCS
 
@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-namespace gbox {
+namespace gbox::tokens {
 
 class TokenTree;
 class Group;
@@ -236,6 +236,6 @@ class Group {
     Delimiter delim_;
 };
 
-}  // namespace gbox
+}  // namespace gbox::tokens
 
-#endif  // GBOX_MACROS_PROC_MACRO_TOKENS_HPP_
+#endif  // GBOX_MACROS_CODEGEN_TOKENS_HPP_

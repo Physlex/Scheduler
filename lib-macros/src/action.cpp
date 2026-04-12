@@ -2,21 +2,19 @@
  * @brief This file implements the adapter module for clang
  */
 
-#include "gbox/macros/adapter.hpp"
-
-#include <string>
+#include "gbox/macros/action.hpp"
 
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Frontend/CompilerInvocation.h"
 
-using namespace gbox::adapter;
+using namespace gbox::action;
 using namespace gbox::result;
 
 Action::Action(clang::DiagnosticsEngine &dengine)
-    : dengine_(dengine), action_(gbox::ProcMacroAction()) {}
+    : dengine_(dengine), action_(plugins::ProcMacroAction()) {}
 
-gbox::adapter::Result<std::string> Action::execute(std::vector<const char *> args) {
+gbox::action::Result<std::string> Action::execute(std::vector<const char *> args) {
     auto invocation = std::shared_ptr<clang::CompilerInvocation>();
     if (!clang::CompilerInvocation::CreateFromArgs(*invocation, args, this->dengine_)) {
         return Err(ErrorKind::InvalidArgs);

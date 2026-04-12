@@ -2,7 +2,7 @@
  * @brief This module implements the parser type.
  */
 
-#include "gbox/macros/parser.hpp"
+#include "gbox/macros/syn/parse.hpp"
 
 #include <clang/Basic/SourceManager.h>
 #include <clang/Basic/TokenKinds.h>
@@ -16,7 +16,7 @@
 #include "gbox/macros/tokens.hpp"
 #include "llvm/ADT/StringRef.h"
 
-using namespace gbox;
+using namespace gbox::parse;
 
 namespace tok {
 
@@ -36,7 +36,8 @@ bool isDelimiter(const clang::tok::TokenKind kind) {
 }  // namespace tok
 
 bool Parser::parse(
-    TokenStream &in, const clang::Token tok, const llvm::StringRef symbol, Span span
+    tokens::TokenStream &in, const clang::Token tok, const llvm::StringRef symbol,
+    tokens::Span span
 ) {
     // Determine what highest-level AST node the token is going to be parsed into
 
@@ -56,7 +57,8 @@ bool Parser::parse(
 }
 
 bool Parser::parse_identifiers(
-    TokenStream &in, const clang::Token tok, const llvm::StringRef symbol, Span span
+    tokens::TokenStream &in, const clang::Token tok, const llvm::StringRef symbol,
+    tokens::Span span
 ) {
     // Identifiers are easy, just check if they are user-defined or not
     in.emplace_back(Ident(symbol.str(), span, tok.is(clang::tok::raw_identifier)));
@@ -65,7 +67,8 @@ bool Parser::parse_identifiers(
 }
 
 bool Parser::parse_literals(
-    TokenStream &in, const clang::Token tok, const llvm::StringRef symbol, Span span
+    tokens::TokenStream &in, const clang::Token tok, const llvm::StringRef symbol,
+    tokens::Span span
 ) {
     const auto kind = tok.getKind();
 
@@ -109,7 +112,8 @@ bool Parser::parse_literals(
 }
 
 bool Parser::parse_group(
-    TokenStream &in, const clang::Token tok, const llvm::StringRef slice, Span span
+    tokens::TokenStream &in, const clang::Token tok, const llvm::StringRef slice,
+    tokens::Span span
 ) {
     // Store the group kind and associated matching token
 
@@ -166,7 +170,7 @@ bool Parser::parse_group(
     this->idx_ += 1;
 
     // Recursively parse each token within the inner group
-    TokenStream inner;
+    tokens::TokenStream inner;
     while ((this->idx_ < tail) && (this->parse_aux(inner)));
     if (this->idx_ != tail) return false;
 
@@ -181,7 +185,8 @@ bool Parser::parse_group(
 }
 
 bool Parser::parse_punctuation(
-    TokenStream &in, const clang::Token tok, const llvm::StringRef symbol, Span span
+    tokens::TokenStream &in, const clang::Token tok, const llvm::StringRef symbol,
+    tokens::Span span
 ) {
     // TODO: Add support for joinable operators
     in.emplace_back(Punc(symbol.str(), span, false));
@@ -190,7 +195,8 @@ bool Parser::parse_punctuation(
 }
 
 bool Parser::parse_numerics(
-    TokenStream &in, const clang::Token tok, const llvm::StringRef symbol, Span span
+    tokens::TokenStream &in, const clang::Token tok, const llvm::StringRef symbol,
+    tokens::Span span
 ) {
     auto number = clang::NumericLiteralParser(
         symbol, tok.getLocation(), this->clang_.sm,

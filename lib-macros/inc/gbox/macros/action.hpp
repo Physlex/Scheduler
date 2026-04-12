@@ -1,16 +1,17 @@
-#ifndef GBOX_MACROS_ADAPTER_HPP_
-#define GBOX_MACROS_ADAPTER_HPP_
+#ifndef GBOX_MACROS_ACTION_HPP_
+#define GBOX_MACROS_ACTION_HPP_
 
-/**
- * @file adapter.hpp
- * @brief This module implements the adaptor for the clang plugin macro action
- */
+// TODO: DOCS
 
-#include "clang/Basic/Diagnostic.h"
-#include "gbox/macros/plugins.hpp"
+#include <clang/Basic/Diagnostic.h>
+
+#include <string>
+
 #include "gbox/macros/result.hpp"
+// TODO: Probably should condense this into the current module instead of keeping seperate
+#include "gbox/macros/action/plugins.hpp"
 
-namespace gbox::adapter {
+namespace gbox::action {
 
 /**
  *  @brief This enumerator defines the error kinds avaliable for a given action
@@ -39,10 +40,10 @@ class Action {
     Result<std::string> execute(std::vector<const char *> args);
 
   private:
-    gbox::ProcMacroAction action_;
+    plugins::ProcMacroAction action_;
     clang::DiagnosticsEngine &dengine_;
 };
 
-}  // namespace gbox::adapter
+}  // namespace gbox::action
 
-#endif  // GBOX_MACROS_ADAPTER_HPP_
+#endif  // GBOX_MACROS_ACTION_HPP_

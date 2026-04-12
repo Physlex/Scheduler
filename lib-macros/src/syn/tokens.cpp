@@ -2,12 +2,12 @@
  * TODO: DOCS
  */
 
-#include "gbox/macros/tokens.hpp"
+#include "gbox/macros/syn/tokens.hpp"
 
 #include <memory>
 #include <string>
 
-using namespace gbox;
+using namespace gbox::tokens;
 
 std::string TokenStream::toString(uint32_t &cursor) const {
     std::string res;

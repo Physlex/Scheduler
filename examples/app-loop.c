@@ -8,8 +8,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include <gbox/macros/async.hpp>
-
 struct user_main_task_args {
     int32_t argc;
     char **argv;
@@ -18,7 +16,7 @@ struct user_main_task_args {
 /// This should really be something that can be automatically "reinterpreted"
 /// and type-specified
 [[clang::annotate("task")]]
-async static inline int32_t hello_msg(void *low_level_msg) {
+static inline int32_t hello_msg(void *low_level_msg) {
     if (!low_level_msg) {
         return -EC_REQUIRES;
     }
@@ -31,7 +29,7 @@ async static inline int32_t hello_msg(void *low_level_msg) {
 /// Meanwhile, this will be the original "main", which is generated via
 /// attribute
 [[clang::annotate("executor")]]
-async int32_t user_main(void *args) {
+int32_t user_main(void *args) {
     struct user_main_task_args args_actual = *(struct user_main_task_args *)args;
 
     task_t task_0 = simple_task_create(hello_msg, "Hello");

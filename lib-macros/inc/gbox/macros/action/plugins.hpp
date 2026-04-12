@@ -9,16 +9,15 @@
 #include <clang/ASTMatchers/ASTMatchFinder.h>
 #include <clang/ASTMatchers/ASTMatchers.h>
 #include <clang/Frontend/CompilerInstance.h>
+#include <clang/Frontend/FrontendAction.h>
 #include <clang/Frontend/FrontendPluginRegistry.h>
 #include <clang/Rewrite/Core/Rewriter.h>
+#include <llvm/ADT/RewriteBuffer.h>
+#include <llvm/ADT/StringRef.h>
 
 #include <memory>
 
-#include "clang/Frontend/FrontendAction.h"
-#include "llvm/ADT/RewriteBuffer.h"
-#include "llvm/ADT/StringRef.h"
-
-namespace gbox {
+namespace gbox::plugins {
 
 /// Boilerplate to handle clang
 class HandleFuncDecl : public clang::ast_matchers::MatchFinder::MatchCallback {
@@ -81,6 +80,6 @@ class ProcMacroAction : public clang::ASTFrontendAction {
     std::string rewritten_;
 };
 
-}  // namespace gbox
+}  // namespace gbox::plugins
 
 #endif  // GBOX_MACROS_PLUGINS_HPP_

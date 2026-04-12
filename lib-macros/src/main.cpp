@@ -13,6 +13,7 @@
 #include <clang/Tooling/CommonOptionsParser.h>
 #include <clang/Tooling/Tooling.h>
 #include <llvm/ADT/IntrusiveRefCntPtr.h>
+#include <llvm/ADT/SmallString.h>
 #include <llvm/ADT/SmallVector.h>
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Support/InitLLVM.h>
@@ -25,10 +26,9 @@
 #include <memory>
 #include <vector>
 
-#include "gbox/macros/adapter.hpp"
+#include "gbox/macros/action.hpp"
+#include "gbox/macros/action/plugins.hpp"
 #include "gbox/macros/cli.hpp"
-#include "gbox/macros/plugins.hpp"
-#include "llvm/ADT/SmallString.h"
 
 /**
  * @brief Entry point to the program.
@@ -78,7 +78,7 @@ int32_t main(int argc, const char **argv) {
         const char *const *end = begin + args.size() - 1;
         auto args_slice = std::vector<const char *>(begin, end);
 
-        auto action = gbox::adapter::Action(*diag);
+        auto action = gbox::action::Action(*diag);
         action.execute(args_slice);
     }
 

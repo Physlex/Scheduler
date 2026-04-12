@@ -3,7 +3,7 @@
  *         preprocessing macros.
  */
 
-#include "gbox/macros/plugins.hpp"
+#include "gbox/macros/action/plugins.hpp"
 
 #include <clang/AST/ASTContext.h>
 #include <clang/ASTMatchers/ASTMatchFinder.h>
@@ -16,15 +16,18 @@
 
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Frontend/CompilerInstance.h"
-#include "gbox/macros/parser.hpp"
-#include "gbox/macros/tokens.hpp"
+#include "gbox/macros/syn/parse.hpp"
+#include "gbox/macros/syn/tokens.hpp"
 #include "llvm/ADT/RewriteBuffer.h"
 #include "llvm/Support/raw_ostream.h"
 
+using namespace gbox::plugins;
 using namespace gbox;
 
 // TODO: Demonstrate full s2s translation in-memory using the system described prior.
-TokenStream proc_macro_executor(TokenStream &input) { return TokenStream(); }
+tokens::TokenStream proc_macro_executor(tokens::TokenStream &input) {
+    return tokens::TokenStream();
+}
 
 void HandleFuncDecl::run(const clang::ast_matchers::MatchFinder::MatchResult &res) {
     const clang::FunctionDecl *func_decl =
@@ -85,18 +88,18 @@ void HandleFuncDecl::run(const clang::ast_matchers::MatchFinder::MatchResult &re
 
     // Parsing stage
 
-    gbox::Parser parser = gbox::Parser(
-        gbox::ClangCtx{tokens, sm, res, res.Context->getDiagnostics()},
-        gbox::FileInfo{file, buffer, length}
+    parse::Parser parser = parse::Parser(
+        parse::ClangCtx{tokens, sm, res, res.Context->getDiagnostics()},
+        parse::FileInfo{file, buffer, length}
     );
 
-    TokenStream stream;
+    tokens::TokenStream stream;
     if (!parser.parse(stream)) {
-        llvm::outs() << "Failed to parse tokens into TokenStream\n";
+        llvm::outs() << "Failed to parse tokens into tokens::TokenStream\n";
         return;
     }
 
-    // Invoke TokenStream proc macro plugins
+    // Invoke tokens::TokenStream proc macro plugins
 
     // FIXME: Exactly what's on the tin
     // for (size_t idx = 0; idx < annotations.size(); idx += 1) {

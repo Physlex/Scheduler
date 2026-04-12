@@ -2,7 +2,7 @@
  * @brief This module implements tests for the plugins.cpp implementation.
  */
 
-#include "gbox/macros/plugins.hpp"
+#include "gbox/macros/action/plugins.hpp"
 
 #include <clang/Tooling/Tooling.h>
 #include <gtest/gtest.h>
@@ -16,5 +16,7 @@ TEST(PluginsTestSuite, TestSimple) {
         "int main() { return 0; }"
         "";
 
-    clang::tooling::runToolOnCode(std::make_unique<gbox::ProcMacroAction>(), code);
+    clang::tooling::runToolOnCode(
+        std::make_unique<gbox::plugins::ProcMacroAction>(), code
+    );
 }
