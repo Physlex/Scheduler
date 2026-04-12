@@ -16,7 +16,7 @@
     let
       pkgs = import nixpkgs { inherit system; };
       cmakeFlags = [
-        "-DCMAKE_TOOLCHAIN_FILE=$src/cmake/clang-toolchain.cmake"
+        "-DCMAKE_TOOLCHAIN_FILE=$PWD/cmake/clang-toolchain.cmake"
         "-DCMAKE_C_COMPILER=${pkgs.llvmPackages_latest.clang}/bin/clang"
         "-DCMAKE_CXX_COMPILER=${pkgs.llvmPackages_latest.clang}/bin/clang++"
         "-DCMAKE_BUILD_TYPE=Debug"
