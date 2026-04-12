@@ -7,7 +7,7 @@
 
 #include <string>
 
-#include "gbox/macros/result.hpp"
+#include "gbox/core/result.hpp"
 // TODO: Probably should condense this into the current module instead of keeping seperate
 #include "gbox/macros/action/plugins.hpp"
 

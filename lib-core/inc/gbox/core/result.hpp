@@ -1,5 +1,7 @@
-#ifndef GBOX_MACROS_RESULT_HPP_
-#define GBOX_MACROS_RESULT_HPP_
+#ifndef GBOX_CORE_RESULT_HPP_
+#define GBOX_CORE_RESULT_HPP_
+
+// TODO: DOCS
 
 /** @file `result.hpp`
  *  @brief This file defines a rust-style result type for error state propagation.
@@ -98,4 +100,4 @@ auto match_result(Result<T, E> &res, OkMatch &&ok_match, ErrMatch &&err_match) {
 
 }  // namespace gbox::result
 
-#endif  // GBOX_MACROS_RESULT_HPP_
+#endif  // GBOX_CORE_RESULT_HPP_
