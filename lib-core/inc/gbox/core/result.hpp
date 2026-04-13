@@ -85,15 +85,19 @@ struct overloaded : Match... {
 /// Simpler terms, it allows matching against an std::variant and forces the user to
 /// define a match arm for every possible variant that the sum type defines.
 template <typename AbstractSumType, typename... Matches>
-auto match(AbstractSumType &variant, Matches &&...matches) {
-    return std::visit(overloaded{std::forward(matches)...}, std::forward(variant));
+auto match(AbstractSumType &&variant, Matches &&...matches) {
+    return std::visit(
+        overloaded{std::forward<Matches>(matches)...},
+        std::forward<AbstractSumType>(variant)
+    );
 }
 
 /// Match specialization for a result type, which forces an "Err" and "Ok" match arm
 template <typename T, typename E, typename OkMatch, typename ErrMatch>
-auto match_result(Result<T, E> &res, OkMatch &&ok_match, ErrMatch &&err_match) {
-    return match(
-        std::forward(res), [&](T &&val) { return ok_match(Ok<T>{std::move(val)}); },
+auto match_result(Result<T, E> &&res, OkMatch &&ok_match, ErrMatch &&err_match) {
+    return match<Result<T, E>>(
+        std::forward<Result<T, E>>(res),
+        [&](T &&val) { return ok_match(Ok<T>{std::move(val)}); },
         [&](E &&err) { return err_match(Err<E>{std::move(err)}); }
     );
 }

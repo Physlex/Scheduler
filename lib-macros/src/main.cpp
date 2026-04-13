@@ -23,31 +23,41 @@
 #include <stdint.h>
 #include <unistd.h>
 
+#include <cstdlib>
 #include <memory>
 #include <vector>
 
+#include "gbox/core/result.hpp"
 #include "gbox/macros/action.hpp"
-#include "gbox/macros/action/plugins.hpp"
 #include "gbox/macros/cli.hpp"
+
+using namespace gbox;
+using namespace gbox::result;
 
 /**
  * @brief Entry point to the program.
  */
 int32_t main(int argc, const char **argv) {
+    // Handle command line arguments provided to the gbclang driver
+
     // All of our clang wrappers will be "gb" + <name>, so skip the "gb"
-    std::string interrupted_path = gbox::cli::stripGBFromPath(argv[0]);
-    std::string abs_clang_path = gbox::cli::clangPathFromName(interrupted_path);
-    auto driver_args = llvm::SmallVector<const char *, 256>(argv, argv + argc);
+    std::string interrupted_path = cli::stripGBFromPath(argv[0]);
+    std::string abs_clang_path = cli::clangPathFromName(interrupted_path);
+    auto args_vec = std::vector<const char *>(argv, argv + argc);
 
-    std::unique_ptr<clang::DiagnosticOptions> diag_opts =
-        clang::CreateAndPopulateDiagOpts(driver_args);
-    diag_opts->DiagnosticSuppressionMappingsFile.clear();
+    // Handle setup of the diagnostics system associated with the clang frontend
 
-    auto *diag_client = new clang::TextDiagnosticPrinter(llvm::errs(), *diag_opts);
+    auto dengine_opts = clang::CreateAndPopulateDiagOpts(args_vec);
+
+    auto diag_client =
+        std::make_unique<clang::TextDiagnosticPrinter>(llvm::errs(), *dengine_opts);
     llvm::IntrusiveRefCntPtr<clang::DiagnosticIDs> diag_id(new clang::DiagnosticIDs());
+
     llvm::IntrusiveRefCntPtr<clang::DiagnosticsEngine> diag(
-        new clang::DiagnosticsEngine(diag_id, *diag_opts, diag_client)
+        new clang::DiagnosticsEngine(diag_id, *dengine_opts, diag_client)
     );
+
+    // Handle construction of the clang driver
 
     auto driver =
         clang::driver::Driver(abs_clang_path, llvm::sys::getDefaultTargetTriple(), *diag);
@@ -57,16 +67,14 @@ int32_t main(int argc, const char **argv) {
 
     driver.setTargetAndMode(target_and_mode);
 
-    std::unique_ptr<clang::driver::Compilation> compilation(
-        driver.BuildCompilation(driver_args)
-    );
+    auto compilation = driver.BuildCompilation(args_vec);
     if (!compilation || diag->hasErrorOccurred()) {
         return 1;
     }
 
-    gbox::cli::fixupDiagPrefixExeName(diag_client, abs_clang_path);
+    // Handle code-level rewrites
 
-    std::vector<std::string> true_list;
+    gbox::cli::fixupDiagPrefixExeName(diag_client, abs_clang_path);
     for (const auto &job : compilation->getJobs()) {
         const auto *cmd = llvm::dyn_cast<clang::driver::Command>(&job);
         if (!cmd) continue;
@@ -78,8 +86,16 @@ int32_t main(int argc, const char **argv) {
         const char *const *end = begin + args.size() - 1;
         auto args_slice = std::vector<const char *>(begin, end);
 
-        auto action = gbox::action::Action(*diag);
-        action.execute(args_slice);
+        // TODO: Refactor the string into a map of files rewritten -> rewritten code
+        auto action_exec_res = gbox::action::Action(*diag).execute(args_slice);
+        std::string rewritten = "";
+        gbox::result::match_result(
+            std::move(action_exec_res),
+            [&](Ok<std::string> &&o) { rewritten = std::move(o.value); },
+            [&](Err<gbox::action::ErrorKind> &&e) {
+                llvm::errs() << "Failed to execute action";
+            }
+        );
     }
 
     llvm::SmallVector<llvm::StringRef> args(argv, argv + argc);
