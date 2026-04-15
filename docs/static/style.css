@@ -1,0 +1,313 @@
+@import "highlight.css";
+@import "ayu.css";
+
+body {
+    font-family: var(--font-secondary);
+    font-size: var(--font-scale);
+    margin: 0 auto;
+    margin-left: 25%;
+    padding: 20px;
+    width: var(--width);
+    max-width: 100%;
+    text-align: left;
+    background-color: var(--bg-color);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    overflow-x: hidden;
+    line-height: 1.8;
+    color: var(--text-color);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-main);
+    color: var(--heading-color);
+}
+
+h1.section, h2.section, h3.section, h4.section, h5.section, h6.section {
+    border-bottom: 1px solid var(--text-color);
+}
+
+.namespace-link {
+    border-bottom: 0;
+    line-height: 1;
+    font-family: var(--font-main);
+}
+
+a {
+    color: var(--link-color);
+    cursor: pointer;
+    text-decoration: none;
+}
+
+nav a {
+    margin-right: 8px;
+}
+
+strong,
+b {
+    color: var(--heading-color);
+}
+
+button {
+    margin: 0;
+    cursor: pointer;
+}
+
+main {
+    line-height: 1.6;
+}
+
+table {
+    width: 100%;
+}
+
+hr {
+    border: 0;
+    border-top: 1px dashed;
+}
+
+img {
+    max-width: 100%;
+}
+
+.highlight pre {
+    font-family: var(--font-code);
+}
+
+code {
+    font-family: var(--font-code);
+    padding: 2px;
+    color: var(--code-color);
+    border-radius: 3px;
+    background-color: var(--code-bg-color);
+}
+
+.nobg,
+.nobg * {
+    background-color: var(--bg-color) !important;
+    padding: 0px !important;
+}
+
+
+footer {
+    padding: 25px 0;
+    text-align: center;
+}
+
+.item-table {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+:target {
+    background-color: var(--highlight-color);
+}
+
+
+.item-table li {
+    display: flex;
+    justify-content: space-between;
+}
+
+.item-name {
+    font-family: var(--font-main);
+}
+
+
+a code {
+    color: var(--link-color) !important;
+}
+
+.item-name .item-desc * {
+    margin-left: auto;
+}
+
+.item-desc {
+    margin-left: 20px;
+}
+
+.item-desc p {
+    display: inline;
+}
+
+.highlight,
+.code {
+    padding: 1px 15px;
+    border-radius: 3px;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    width: calc(100%-2rem);
+    overflow-x: auto;
+}
+
+div.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 300px;
+  padding: 0;
+  background-color: var(--sidebar-bg);
+  word-wrap: break-word;
+  overflow: hidden;
+  z-index: 1000;
+}
+
+div.sidebarwrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 10px 5px 0 10px;
+}
+
+div.sidebar-scroll {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+div.sidebar ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.sidebar-scroll {
+  scrollbar-color: var(--scrollbar-color) var(--bg-color);
+}
+
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: var(--bg-color);
+  border-radius: 4px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background-color: var(--text-color);
+  border-radius: 4px;
+  border: 2px solid var(--bg-color); 
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: var(--heading-color);
+}
+
+div.sidebar h1,
+div.sidebar h2,
+div.sidebar h3 {
+    border-bottom: 0;
+    line-height: 1.25rem;
+}
+
+div.sidebar a {
+    font-size: 1rem;
+}
+
+.searchbar {
+    font-family: var(--font-secondary);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border-width: 0.5px;
+    padding: 5px;
+    border-color: var(--text-color);
+    border-radius: 2px;
+}
+
+.mobile-nav {
+  display: none;
+}
+
+
+@media (max-width: 1024px) {
+    div.sidebar {
+        float: none;
+        width: 100%;
+        margin-left: 0;
+        max-height: none;
+    }
+
+    html,
+    body {
+        margin-left: 0px;
+        overflow-x: hidden;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+
+    }
+
+    /* Make search bar bigger so it's easier to tap on mobile */
+    .searchbar {
+        width: 90%;
+        font-size: 1.2rem;
+    }
+
+    .highlight,
+    .code {
+        width: calc(100%-10rem);
+    }
+
+    .item-table li {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .item-name {
+        flex: 0 0 auto;
+        margin-bottom: 5px;
+    }
+
+    .item-table .item-desc * {
+        margin-left: 20px;
+    }
+
+  /* Hide the fixed sidebar */
+  div.sidebar {
+    display: none;
+  }
+
+  /* Show mobile nav */
+  .mobile-nav {
+    display: block;
+    padding: 15px;
+    background-color: var(--bg-color);
+    border-bottom: 1px solid var(--text-color);
+  }
+
+  .mobile-nav h1 {
+    font-family: var(--font-main);
+    color: var(--heading-color);
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    border-bottom: 0px;
+  }
+
+  .mobile-nav h2 {
+    margin-top: 1em;
+    font-size: 1.2rem;
+    color: var(--heading-color);
+    border-bottom: 0px;
+  }
+
+  .mobile-nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .mobile-nav li {
+    margin: 4px 0;
+  }
+
+  .mobile-nav a {
+    display: block;
+    color: var(--link-color);
+    font-size: 1rem;
+    text-decoration: none;
+  }
+
+}

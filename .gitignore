@@ -1,8 +1,11 @@
-# file: `.gitignore`
-
 # C/C++ build system
 build/
 .vscode/
+
+# Documentation
+docs/*.css
+docs/*.html
+docs/search_index.json
 
 # Clangd
 .cache/*

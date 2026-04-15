@@ -1,0 +1,19 @@
+[project]
+name = "Granite Box Documentation"
+version = "0.1.0"
+
+[input]
+glob = "inc/**/*.hpp"
+compiler_arguments = ["-Ilib-macros/inc", "-std=gnu++20", "-xc++"]
+
+[pages]
+index = "README.md"
+
+[output]
+static_dir="docs/static"
+path = "docs"
+base_url = "file:///home/alexander/Projects/GBox/docs"
+theme = "ayu-dark"
+
+[doctests]
+enable = false
