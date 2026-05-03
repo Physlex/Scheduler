@@ -2,7 +2,7 @@
  * TODO: DOCS
  */
 
-#include "gbox/macros/syn/tokens.hpp"
+#include "gbox/proc/syn/tokens.hpp"
 
 #include <memory>
 #include <string>

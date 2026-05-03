@@ -2,7 +2,7 @@
  * @brief This module implements the parser type.
  */
 
-#include "gbox/macros/syn/parse.hpp"
+#include "gbox/proc/syn/parse.hpp"
 
 #include <clang/Basic/SourceManager.h>
 #include <clang/Basic/TokenKinds.h>
@@ -13,7 +13,7 @@
 #include <memory>
 
 #include "clang/Lex/Token.h"
-#include "gbox/macros/syn/tokens.hpp"
+#include "gbox/proc/syn/tokens.hpp"
 #include "llvm/ADT/StringRef.h"
 
 using namespace gbox::parse;

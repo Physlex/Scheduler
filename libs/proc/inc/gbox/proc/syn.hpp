@@ -6,8 +6,8 @@
  *         for the gbox proc macros implementation.
  */
 
-#include "gbox/macros/syn/parse.hpp"
-#include "gbox/macros/syn/tokens.hpp"
+#include "gbox/proc/syn/parse.hpp"
+#include "gbox/proc/syn/tokens.hpp"
 
 namespace gbox::syn {
 using FileInfo = parse::FileInfo;

@@ -13,7 +13,7 @@
 
 using namespace gbox::result;
 
-namespace gbox::cli {
+namespace gbclang::cli {
 
 /// Various error defintions used in the CLI interface.
 enum class CliErrorKind {
@@ -40,6 +40,6 @@ Result<std::string> writeVirtualFile(
     const std::string &output_dir
 );
 
-}  // namespace gbox::cli
+}  // namespace gbclang::cli
 
 #endif  // GBOX_MACROS_DRIVER_HPP_

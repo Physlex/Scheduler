@@ -9,7 +9,10 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 
 # Project-wide dependencies
 
-if(NOT CMAKE_C_COMPILER MATCHES "clang" OR NOT CMAKE_CXX_COMPILER MATCHES clang\\+\\+)
+if(
+  NOT CMAKE_C_COMPILER MATCHES "clang" OR
+  NOT CMAKE_CXX_COMPILER MATCHES "clang\\+\\+"
+  )
     message(
       FATAL_ERROR
       "clang improperly installed. Did you use `nix develop`?"
@@ -30,13 +33,17 @@ include(${PROJECT_CONF_PATH}/AddExamples.cmake)
 include(${PROJECT_CONF_PATH}/TargetFormat.cmake)
 include(${PROJECT_CONF_PATH}/AddModule.cmake)
 
-# Workspace modules
+# Workspace module libraries
 
-gbox_module(GBOX_CORE "${PROJECT_SOURCE_DIR}/lib-core")
-gbox_module(GBOX_MACROS "${PROJECT_SOURCE_DIR}/lib-macros")
-gbox_module(GBOX_RUNTIME "${PROJECT_SOURCE_DIR}/lib-runtime")
+gbox_module(GBOX_CORE "${PROJECT_SOURCE_DIR}/libs/core")
+gbox_module(GBOX_PROC "${PROJECT_SOURCE_DIR}/libs/proc")
+gbox_module(GBOX_RUNTIME "${PROJECT_SOURCE_DIR}/libs/runtime")
 
-# Example directory
+# Workspace module applications
+
+gbox_module(GBCLANG "${PROJECT_SOURCE_DIR}/apps/gbclang")
+
+# Workspace examples
 
 set(PROJECT_EXAMPLE_PATH "${PROJECT_SOURCE_DIR}/examples")
 add_subdirectory(${PROJECT_EXAMPLE_PATH})

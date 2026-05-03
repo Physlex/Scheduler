@@ -3,7 +3,7 @@
  *         preprocessing macros.
  */
 
-#include "gbox/macros/action/plugins.hpp"
+#include "gbox/proc/action/plugins.hpp"
 
 #include <clang/AST/ASTContext.h>
 #include <clang/ASTMatchers/ASTMatchFinder.h>
@@ -16,8 +16,8 @@
 
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Frontend/CompilerInstance.h"
-#include "gbox/macros/syn/parse.hpp"
-#include "gbox/macros/syn/tokens.hpp"
+#include "gbox/proc/syn/parse.hpp"
+#include "gbox/proc/syn/tokens.hpp"
 #include "llvm/ADT/RewriteBuffer.h"
 #include "llvm/Support/raw_ostream.h"
 

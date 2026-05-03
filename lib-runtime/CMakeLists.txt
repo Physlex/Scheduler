@@ -1,2 +1,0 @@
-add_library("${GBOX_RUNTIME_NAME}" STATIC ${GBOX_RUNTIME_SRC})
-target_include_directories("${GBOX_RUNTIME_NAME}" PUBLIC "${GBOX_RUNTIME_INC_PATH}")

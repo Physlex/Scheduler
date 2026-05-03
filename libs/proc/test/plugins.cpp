@@ -2,7 +2,7 @@
  * @brief This module implements tests for the plugins.cpp implementation.
  */
 
-#include "gbox/macros/action/plugins.hpp"
+#include "gbox/proc/action/plugins.hpp"
 
 #include <clang/Tooling/Tooling.h>
 #include <gtest/gtest.h>

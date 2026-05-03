@@ -16,7 +16,7 @@
 #include <llvm/ADT/StringRef.h>
 #include <llvm/Support/MemoryBufferRef.h>
 
-#include "gbox/macros/syn/tokens.hpp"
+#include "gbox/proc/syn/tokens.hpp"
 
 namespace gbox::parse {
 

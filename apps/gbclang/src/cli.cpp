@@ -3,7 +3,7 @@
  * @brief This implements command line parameters
  */
 
-#include "gbox/macros/cli.hpp"
+#include "gbclang/cli.hpp"
 
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Support/Path.h>

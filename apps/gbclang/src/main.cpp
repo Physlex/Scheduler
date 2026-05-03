@@ -13,6 +13,7 @@
 #include <llvm/ADT/IntrusiveRefCntPtr.h>
 #include <llvm/ADT/SmallString.h>
 #include <llvm/ADT/SmallVector.h>
+#include <llvm/ADT/StringRef.h>
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Support/InitLLVM.h>
 #include <llvm/Support/Program.h>
@@ -25,12 +26,12 @@
 #include <memory>
 #include <vector>
 
+#include "gbclang/cli.hpp"
 #include "gbox/core/result.hpp"
-#include "gbox/macros/action.hpp"
-#include "gbox/macros/cli.hpp"
-#include "llvm/ADT/StringRef.h"
+#include "gbox/proc/action.hpp"
 
 using namespace gbox;
+using namespace gbclang;
 using namespace gbox::result;
 
 /// Typed response for the `configure_diag` method.

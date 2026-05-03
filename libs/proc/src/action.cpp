@@ -2,7 +2,7 @@
  * @brief This file implements the adapter module for clang
  */
 
-#include "gbox/macros/action.hpp"
+#include "gbox/proc/action.hpp"
 
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Frontend/CompilerInstance.h"
