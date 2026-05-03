@@ -9,7 +9,7 @@
 #include <llvm/Support/Path.h>
 #include <llvm/Support/Program.h>
 
-namespace gbox::cli {
+namespace gbclang::cli {
 
 Result<std::string> stripGBFromPath(std::string path) {
     const auto gb_substr = std::string("gbclang");
@@ -51,4 +51,4 @@ Result<std::string> writeVirtualFile(
     return Ok(std::string(virtual_path));
 }
 
-}  // namespace gbox::cli
+}  // namespace gbclang::cli
