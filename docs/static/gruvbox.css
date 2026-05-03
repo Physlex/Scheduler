@@ -1,0 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap');
+
+:root {
+    --bg_h: #1d2021;
+    --bg: #282828;
+    --bg_s: #32302f;
+    --bg1: #3c3836;
+    --bg2: #504945;
+    --bg3: #665c54;
+    --bg4: #7c6f64;
+
+    --fg: #fbf1c7;
+    --fg1: #ebdbb2;
+    --fg2: #d5c4a1;
+    --fg3: #bdae93;
+    --fg4: #a89984;
+
+    --red: #fb4934;
+    --green: #b8bb26;
+    --yellow: #fabd2f;
+    --blue: #83a598;
+    --purple: #d3869b;
+    --aqua: #8ec07c;
+    --gray: #928374;
+    --orange: #fe8019;
+
+    --red-dim: #cc2412;
+    --green-dim: #98971a;
+    --yellow-dim: #d79921;
+    --blue-dim: #458588;
+    --purple-dim: #b16286;
+    --aqua-dim: #689d6a;
+    --gray-dim: #a89984;
+    --orange-dim: #d65d0e;
+    --font-main: "Fira Sans", sans-serif;
+    --font-secondary: "Source Serif 4", sans-serif;
+    --font-code: "Source Code Pro", monospace;
+    --font-scale: 1rem;
+    --width: 1000px;
+    --bg-color: var(--bg_s);
+    --text-color: var(--fg);
+    --heading-color: var(--fg1);
+    --link-color: var(--blue);
+    --code-color: var(--fg1);
+    --code-bg-color: var(--bg);
+    --highlight-color: var(--bg2);
+    --sidebar-bg: var(--bg);
+}
+
+a:hover, .active {
+    color: var(--orange) !important;
+}

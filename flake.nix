@@ -26,8 +26,27 @@
         export LLVM_DIR=${pkgs.llvmPackages_latest.llvm.dev}/lib/cmake/llvm
         export Clang_DIR=${pkgs.llvmPackages_latest.libclang.dev}/lib/cmake/clang
         export LD_LIBRARY_PATH=${pkgs.stdenv.cc.cc.lib}/lib/
+        export LIBCLANG_PATH=${pkgs.llvmPackages_latest.libclang.lib}/lib
       '';
     in {
+      packages.duck = pkgs.rustPlatform.buildRustPackage {
+        pname = "duck";
+        version = "unstable";
+
+        src = pkgs.fetchFromGitHub {
+          owner = "rdmsr";
+          repo = "duck";
+          rev = "ff95938795dfc9e55f891eb27de68a4bf63b122a";
+          hash = "sha256-aBCm69V//ZtYmmE3GAvUqErSnVIp59te6bJOlibICSM==";
+        };
+
+        cargoHash = "sha256-XzqhofYePhrusi5FPx9qWh8gBCsNUb3QAvi78SKNoJs=";
+
+        LIBCLANG_PATH = "${pkgs.llvmPackages_latest.libclang.lib}/lib";
+        buildInputs = [ pkgs.llvmPackages_latest.libclang ];
+        nativeBuildInputs = [ pkgs.pkg-config ];
+      };
+
       packages.default = pkgs.stdenv.mkDerivation {
         pname = "gbox";
         version = "0.1.0";
@@ -67,7 +86,7 @@
       devShells.default = pkgs.mkShell {
         packages = self.packages.${system}.default.buildInputs
           ++ self.packages.${system}.default.nativeBuildInputs
-          ++ [ pkgs.pre-commit pkgs.uv pkgs.gdb ];
+          ++ [ pkgs.pre-commit pkgs.uv pkgs.gdb pkgs.nixd self.packages.${system}.duck ];
 
         shellHook = ''
           ${cmakeEnv}
