@@ -1,8 +1,7 @@
 /**
- * TODO: DOCS
+ * @file cli.cpp
+ * @brief This implements command line parameters
  */
-
-// FIXME: AI-GENERATED (Too tired to give a fuck)
 
 #include "gbox/macros/cli.hpp"
 
@@ -10,41 +9,29 @@
 #include <llvm/Support/Path.h>
 #include <llvm/Support/Program.h>
 
-namespace gbox {
-namespace cli {
+namespace gbox::cli {
 
-std::string stripGBFromPath(std::string path) {
+Result<std::string> stripGBFromPath(std::string path) {
     const auto gb_substr = std::string("gbclang");
     const auto gb_replace = std::string("clang");
     size_t pos = path.find(gb_substr);
 
-    if (pos == std::string::npos) return "";
+    if (pos == std::string::npos) return Err(CliErrorKind::InvalidArgs);
 
     const auto clang_path = path.replace(pos, gb_substr.length(), gb_replace);
-    return clang_path.substr(pos, gb_replace.length());
+    return Ok(clang_path.substr(pos, gb_replace.length()));
 }
 
-std::string clangPathFromName(std::string executable_path) {
+Result<std::string> clangPathFromName(std::string executable_path) {
     if (!llvm::sys::fs::exists(executable_path)) {
         const auto path = llvm::sys::findProgramByName(executable_path);
         if (path) executable_path = *path;
     }
 
-    return std::string(executable_path);
+    return Ok(std::string(executable_path));
 }
 
-void fixupDiagPrefixExeName(
-    clang::TextDiagnosticPrinter *diag_client, const std::string &path
-) {
-    auto exe_basename = llvm::StringRef(llvm::sys::path::stem(path));
-    if (exe_basename.equals_insensitive("cl")) {
-        exe_basename = "clang-cl";
-    }
-
-    diag_client->setPrefix(std::string(exe_basename));
-}
-
-std::string writeVirtualFile(
+Result<std::string> writeVirtualFile(
     const std::string &input_file, const std::string &rewritten_content,
     const std::string &output_dir
 ) {
@@ -56,14 +43,12 @@ std::string writeVirtualFile(
     std::error_code ec;
     auto out = llvm::raw_fd_ostream(virtual_path.str(), ec);
     if (ec) {
-        llvm::outs() << "ERROR\n";
-        return "";
+        return Err(CliErrorKind::Io);
     }
 
     out << rewritten_content;
 
-    return std::string(virtual_path);
+    return Ok(std::string(virtual_path));
 }
 
-}  // namespace cli
-}  // namespace gbox
+}  // namespace gbox::cli

@@ -57,7 +57,6 @@
           cmake
           gtest
           llvmPackages_latest.clang
-          self.packages.${system}.duck
         ];
 
         buildInputs = with pkgs; [
@@ -87,7 +86,7 @@
       devShells.default = pkgs.mkShell {
         packages = self.packages.${system}.default.buildInputs
           ++ self.packages.${system}.default.nativeBuildInputs
-          ++ [ pkgs.pre-commit pkgs.uv pkgs.gdb pkgs.nixd ];
+          ++ [ pkgs.pre-commit pkgs.uv pkgs.gdb pkgs.nixd self.packages.${system}.duck ];
 
         shellHook = ''
           ${cmakeEnv}

@@ -1,6 +1,4 @@
-/**
- * @brief This file defines the entry point to the gbox clang wrapper.
- */
+//! TODO: Comprehensive docs on usage, invocation, and design process.
 
 #include <clang/Basic/Diagnostic.h>
 #include <clang/Basic/DiagnosticIDs.h>
@@ -30,41 +28,70 @@
 #include "gbox/core/result.hpp"
 #include "gbox/macros/action.hpp"
 #include "gbox/macros/cli.hpp"
+#include "llvm/ADT/StringRef.h"
 
 using namespace gbox;
 using namespace gbox::result;
 
-/**
- * @brief Entry point to the program.
- */
-int32_t main(int argc, const char **argv) {
-    // Handle command line arguments provided to the gbclang driver
+/// Typed response for the `configure_diag` method.
+struct ConfigureDiagRes {
+    /// Fully configured diagnostic engine
+    llvm::IntrusiveRefCntPtr<clang::DiagnosticsEngine> diag;
 
-    // All of our clang wrappers will be "gb" + <name>, so skip the "gb"
-    std::string interrupted_path = cli::stripGBFromPath(argv[0]);
-    std::string abs_clang_path = cli::clangPathFromName(interrupted_path);
-    auto args_vec = std::vector<const char *>(argv, argv + argc);
+    /// Path to be used by the clang driver, stripped of gb influence
+    std::string path;
+};
 
-    // Handle setup of the diagnostics system associated with the clang frontend
-
-    auto dengine_opts = clang::CreateAndPopulateDiagOpts(args_vec);
+/// Configure the clang diagnostics system to gracefully handle gbclang invocations
+Result<ConfigureDiagRes, int> build_diag(std::vector<const char *> &args) {
+    auto diag_opts = clang::CreateAndPopulateDiagOpts(args);
 
     auto diag_client =
-        std::make_unique<clang::TextDiagnosticPrinter>(llvm::errs(), *dengine_opts);
+        std::make_unique<clang::TextDiagnosticPrinter>(llvm::errs(), *diag_opts);
+
     llvm::IntrusiveRefCntPtr<clang::DiagnosticIDs> diag_id(new clang::DiagnosticIDs());
 
     llvm::IntrusiveRefCntPtr<clang::DiagnosticsEngine> diag(
-        new clang::DiagnosticsEngine(diag_id, *dengine_opts, diag_client)
+        new clang::DiagnosticsEngine(diag_id, *diag_opts, diag_client.get())
     );
 
-    // Handle construction of the clang driver
+    auto strip_res = cli::stripGBFromPath(args[0]);
+    if (strip_res.is_err()) {
+        return Err(1);
+    }
 
+    auto stripped_pathname = strip_res.unwrap();
+
+    auto clean_res = cli::clangPathFromName(stripped_pathname);
+    if (clean_res.is_err()) {
+        return Err(1);
+    }
+
+    auto clean_pathname = clean_res.unwrap();
+
+    auto exe_basename = llvm::StringRef(llvm::sys::path::stem(clean_pathname));
+    if (exe_basename.equals_insensitive("cl")) {
+        exe_basename = "clang-cl";
+    }
+
+    diag_client->setPrefix(std::string(exe_basename));
+
+    return Ok(ConfigureDiagRes{diag, clean_pathname});
+}
+
+int32_t main(int argc, const char **argv) {
+    auto args_vec = std::vector<const char *>(argv, argv + argc);
+
+    auto diag_config_res = build_diag(args_vec);
+    if (diag_config_res.is_err()) {
+        return diag_config_res.unwrap_err();
+    }
+
+    auto [diag, clean_path] = diag_config_res.unwrap();
     auto driver =
-        clang::driver::Driver(abs_clang_path, llvm::sys::getDefaultTargetTriple(), *diag);
-
+        clang::driver::Driver(clean_path, llvm::sys::getDefaultTargetTriple(), *diag);
     auto target_and_mode =
-        clang::driver::ToolChain::getTargetAndModeFromProgramName(argv[0]);
-
+        clang::driver::ToolChain::getTargetAndModeFromProgramName(clean_path);
     driver.setTargetAndMode(target_and_mode);
 
     auto compilation = driver.BuildCompilation(args_vec);
@@ -72,9 +99,6 @@ int32_t main(int argc, const char **argv) {
         return 1;
     }
 
-    // Handle code-level rewrites
-
-    gbox::cli::fixupDiagPrefixExeName(diag_client, abs_clang_path);
     for (const auto &job : compilation->getJobs()) {
         const auto *cmd = llvm::dyn_cast<clang::driver::Command>(&job);
         if (!cmd) continue;
@@ -99,5 +123,5 @@ int32_t main(int argc, const char **argv) {
     }
 
     llvm::SmallVector<llvm::StringRef> args(argv, argv + argc);
-    return llvm::sys::ExecuteAndWait(abs_clang_path, args);
+    return llvm::sys::ExecuteAndWait(clean_path, args);
 }

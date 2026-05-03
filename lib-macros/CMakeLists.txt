@@ -10,14 +10,17 @@ include(${Clang_DIR}/AddClang.cmake)
 
 add_definitions(${LLVM_DEFINITIONS})
 
+message(${CLANG_INCLUDE_DIRS})
+message(${LLVM_INCLUDE_DIRS})
+
 # Library creation
 add_library(${GBOX_MACROS_NAME} STATIC ${GBOX_MACROS_SRC})
 target_include_directories(${GBOX_MACROS_NAME}
   PUBLIC
-  "${GBOX_MACROS_INC_PATH}"
-  "${GBOX_CORE_INC_PATH}"
-  "${CLANG_INCLUDE_DIRS}"
-  "${LLVM_INCLUDE_DIRS}"
+  ${GBOX_MACROS_INC_PATH}
+  ${GBOX_CORE_INC_PATH}
+  ${CLANG_INCLUDE_DIRS}
+  ${LLVM_INCLUDE_DIRS}
 )
 
 target_link_libraries(${GBOX_MACROS_NAME}
@@ -29,5 +32,5 @@ target_link_libraries(${GBOX_MACROS_NAME}
 )
 
 # Binary creation
-add_executable(${GBOX_CLANG_WRAPPER_NAME} "${GBOX_MACROS_SRC_PATH}/main.cpp")
-target_link_libraries(${GBOX_CLANG_WRAPPER_NAME} PRIVATE "${GBOX_MACROS_NAME}")
+add_executable(${GBOX_CLANG_WRAPPER_NAME} ${GBOX_MACROS_SRC_PATH}/main.cpp)
+target_link_libraries(${GBOX_CLANG_WRAPPER_NAME} PRIVATE ${GBOX_MACROS_NAME})

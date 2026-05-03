@@ -1,11 +1,10 @@
 #ifndef GBOX_CORE_RESULT_HPP_
 #define GBOX_CORE_RESULT_HPP_
 
-// TODO: DOCS
-
-/** @file `result.hpp`
- *  @brief This file defines a rust-style result type for error state propagation.
- */
+//! This module implements rust-style result semantics for cpp.
+//!
+//! This is done simply because results error propagation is honestly the
+//! best form of error propagation I've ever seen.
 
 #include <utility>
 #include <variant>
@@ -17,11 +16,26 @@ template <typename T, typename E>
 using ResultInner =
     std::variant<std::conditional_t<std::is_void_v<T>, std::monostate, T>, E>;
 
+/// Force the compiler to assume "monostate" defintitions so it can pretend to
+/// "infer" the void type, when it's really doing a mini- exhaustive search
+template <typename T = void>
+struct Ok;
+
+/// Deduction guideline for the Ok result builder
+template <typename T>
+Ok(T) -> Ok<T>;
+
 /// Proxy-class for a Result which has some valid value
 template <typename T>
 struct Ok {
     T value;
     Ok(T v) : value(std::move(v)) {}
+};
+
+/// Specialization for void-case Ok types
+template <>
+struct Ok<void> {
+    Ok() = default;
 };
 
 /// Proxy-class for a Result which has an errorfull value
@@ -31,26 +45,39 @@ struct Err {
     Err(E v) : value(std::move(v)) {}
 };
 
+/// Deduction guideline for the Err result builder
+template <typename E>
+Err(E) -> Err<E>;
+
 /// Pseudo-functional result type, for error propagation without needing to use the cpp
 /// expected type
 template <typename T, typename E>
-class Result : public ResultInner<T, E> {
+class Result {
   public:
-    // Inherit the same constructors as result inner would have
-    using ResultInner<T, E>::ResultInner;
-
     /// Move constructor for reinterpreting an "Ok" value to a result with a valid type
-    Result(Ok<T> &&o) : ResultInner<T, E>(std::move(o.value)) {};
+    Result(Ok<T> &&o) {
+        if constexpr (std::is_void_v<T>) {
+            this->inner_ = std::monostate();
+        } else {
+            this->inner_ = std::move(o.value);
+        }
+    };
 
     /// Move constructor for reinterpreting an "Err" value to a result with an errorfull
     /// type
-    Result(Err<E> &&e) : ResultInner<T, E>(std::move(e.value)) {};
+    Result(Err<E> &&e) : inner_(std::move(e.value)) {};
 
     /// Determines if the result is an error type
     inline bool is_err() { return std::holds_alternative<E>(this->inner_); }
 
-    /// Determines if the result is an "ok" type
-    inline bool is_ok() { return std::holds_alternative<T>(this->inner_); }
+    /// Checks that the underlying type is a valid-state type, and
+    inline bool is_ok() {
+        if constexpr (std::is_void_v<T>) {
+            return std::holds_alternative<std::monostate>(this->inner_);
+        } else {
+            return std::holds_alternative<T>(this->inner_);
+        }
+    }
 
     /// Attempts to get access to the underlying type. Panics if the result is errorfull
     inline T unwrap() { return std::get<T>(this->inner_); }
@@ -59,9 +86,14 @@ class Result : public ResultInner<T, E> {
     /// non-errorfull
     inline E unwrap_err() { return std::get<E>(this->inner_); }
 
+    inline ResultInner<T, E> inner() const { return this->inner_; }
+
   private:
     ResultInner<T, E> inner_;
 };
+
+// FIXME: Remove the dispatch-based result type once we get the opportunity to make a
+// better ADT
 
 /// Standard "overloaded" type definition. Forces the "visit" method to use all possible
 /// variants...
@@ -95,9 +127,8 @@ auto match(AbstractSumType &&variant, Matches &&...matches) {
 /// Match specialization for a result type, which forces an "Err" and "Ok" match arm
 template <typename T, typename E, typename OkMatch, typename ErrMatch>
 auto match_result(Result<T, E> &&res, OkMatch &&ok_match, ErrMatch &&err_match) {
-    return match<Result<T, E>>(
-        std::forward<Result<T, E>>(res),
-        [&](T &&val) { return ok_match(Ok<T>{std::move(val)}); },
+    return match(
+        std::move(res.inner()), [&](T &&val) { return ok_match(Ok<T>{std::move(val)}); },
         [&](E &&err) { return err_match(Err<E>{std::move(err)}); }
     );
 }
