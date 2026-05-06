@@ -49,4 +49,70 @@ TEST(resultUnwrapErr, resultTests) {
     res.unwrap_err();
 }
 
-// TODO: Fill out the result api...
+TEST(resultErrVoidBuilder, resultTests) {
+    Result<void> res = Err(ErrorKind::Any);
+    ASSERT_TRUE(res.is_err());
+}
+
+TEST(resultIsOkTrue, resultTests) {
+    Result<int> res = Ok(1);
+    ASSERT_TRUE(res.is_ok());
+}
+
+TEST(resultIsOkFalse, resultTests) {
+    Result<int> res = Err(ErrorKind::Any);
+    ASSERT_FALSE(res.is_ok());
+}
+
+TEST(resultIsErrTrue, resultTests) {
+    Result<int> res = Err(ErrorKind::Any);
+    ASSERT_TRUE(res.is_err());
+}
+
+TEST(resultIsErrFalse, resultTests) {
+    Result<int> res = Ok(1);
+    ASSERT_FALSE(res.is_err());
+}
+
+TEST(resultIsOkVoid, resultTests) {
+    Result<void> res = Ok();
+    ASSERT_TRUE(res.is_ok());
+}
+
+TEST(resultUnwrapErrValue, resultTests) {
+    Result<int> res = Err(ErrorKind::Any);
+    ASSERT_EQ(ErrorKind::Any, res.unwrap_err());
+}
+
+TEST(resultUnwrapOnErrThrows, resultTests) {
+    Result<int> res = Err(ErrorKind::Any);
+    ASSERT_THROW(res.unwrap(), std::bad_variant_access);
+}
+
+TEST(resultUnwrapErrOnOkThrows, resultTests) {
+    Result<int> res = Ok(1);
+    ASSERT_THROW(res.unwrap_err(), std::bad_variant_access);
+}
+
+TEST(resultMatchOk, resultTests) {
+    Result<int> res = Ok(1);
+    int matched = 0;
+    result::match_result(
+        std::move(res), [&](Ok<int> ok) { matched = ok.value; },
+        [&](Err<ErrorKind>) { ADD_FAILURE() << "expected Ok branch"; }
+    );
+    ASSERT_EQ(1, matched);
+}
+
+TEST(resultMatchErr, resultTests) {
+    Result<int> res = Err(ErrorKind::Any);
+    bool err_called = false;
+    result::match_result(
+        std::move(res), [&](Ok<int>) { ADD_FAILURE() << "expected Err branch"; },
+        [&](Err<ErrorKind> err) {
+            err_called = true;
+            ASSERT_EQ(ErrorKind::Any, err.value);
+        }
+    );
+    ASSERT_TRUE(err_called);
+}
