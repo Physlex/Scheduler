@@ -25,7 +25,7 @@ struct Ok;
 template <typename T>
 Ok(T) -> Ok<T>;
 
-/// Proxy-class for a Result which has some valid value
+/// Proxy-class for a Result which has some valid value'
 template <typename T>
 struct Ok {
     T value;
@@ -80,7 +80,14 @@ class Result {
     }
 
     /// Attempts to get access to the underlying type. Panics if the result is errorfull
-    inline T unwrap() { return std::get<T>(this->inner_); }
+    inline T unwrap() {
+        if constexpr (std::is_void_v<T>) {
+            std::get<std::monostate>(this->inner_);
+            return;
+        } else {
+            return std::get<T>(this->inner_);
+        }
+    }
 
     /// Attempts to get access to the underlying error. Panics if the result is
     /// non-errorfull
